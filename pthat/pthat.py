@@ -214,6 +214,7 @@ class PTHat:
         if self.debug:
             print(f"get_io_port_status command: {command}")
         self.send_command(command=command)
+        return command
 
     def set_wait_delay(self, period="W", delay=None):
         """
@@ -268,6 +269,7 @@ class PTHat:
         if self.debug:
             print(f"set_wait_delay command: {command}")
         self.send_command(command=command)
+        return command
 
     def toggle_motor_enable_line(self):
         """
@@ -303,6 +305,7 @@ class PTHat:
         if self.debug:
             print(f"toggle_motor_enable_line command: {command}")
         self.send_command(command=command)
+        return command
 
     def received_command_replies_on(self):
         """
@@ -342,6 +345,7 @@ class PTHat:
         if self.debug:
             print(f"received_command_replies_on command: {command}")
         self.send_command(command=command)
+        return command
 
     def received_command_replies_off(self):
         """
@@ -381,6 +385,7 @@ class PTHat:
         if self.debug:
             print(f"received_command_replies_off command: {command}")
         self.send_command(command=command)
+        return command
 
     def completed_command_replies_on(self):
         """
@@ -420,6 +425,7 @@ class PTHat:
         if self.debug:
             print(f"completed_command_replies_on command: {command}")
         self.send_command(command=command)
+        return command
 
     def completed_command_replies_off(self):
         """
@@ -459,6 +465,7 @@ class PTHat:
         if self.debug:
             print(f"completed_command_replies_off command: {command}")
         self.send_command(command=command)
+        return command
 
     def get_firmware_version(self):
         """
@@ -493,6 +500,7 @@ class PTHat:
         if self.debug:
             print(f"get_firmware_version command: {command}")
         self.send_command(command=command)
+        return command
 
     def reset(self):
         """
@@ -526,6 +534,7 @@ class PTHat:
         self._motor_enabled = False
         self._received_command_replies_enabled = False
         self._completed_command_replies_enabled = False
+        return command
 
     def initiate_buffer(self):
         """
@@ -568,6 +577,7 @@ class PTHat:
         if self.debug:
             print(f"initiate_buffer command: {command}")
         self.send_command(command=command)
+        return command
 
     def start_buffer(self):
         """
@@ -595,6 +605,7 @@ class PTHat:
         if self.debug:
             print(f"start_buffer command: {command}")
         self.send_command(command=command)
+        return command
 
     def start_buffer_loop(self):
         """
@@ -625,6 +636,7 @@ class PTHat:
         if self.debug:
             print(f"start_buffer_loop command: {command}")
         self.send_command(command=command)
+        return command
 
     def rpm_to_frequency(self, rpm, steps_per_rev, round_digits):
         """
@@ -887,6 +899,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"set_axis command: {command}")
         self.send_command(command=command)
+        return command
 
     def set_direction_forward(self):
         """
@@ -895,7 +908,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"set_direction_forward command")
         self.direction = 0
-        self.set_axis()
+        return self.set_axis()
 
     def set_direction_reverse(self):
         """
@@ -904,7 +917,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"set_direction_reverse command")
         self.direction = 1
-        self.set_axis()
+        return self.set_axis()
 
     def enable_start_ramp(self):
         """
@@ -913,7 +926,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"enable_start_ramp command")
         self.start_ramp = 1
-        self.set_axis()
+        return self.set_axis()
 
     def disable_start_ramp(self):
         """
@@ -922,7 +935,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"disable_start_ramp command")
         self.start_ramp = 0
-        self.set_axis()
+        return self.set_axis()
 
     def enable_finish_ramp(self):
         """
@@ -931,7 +944,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"enable_finish_ramp command")
         self.finish_ramp = 1
-        self.set_axis()
+        return self.set_axis()
 
     def disable_finish_ramp(self):
         """
@@ -940,7 +953,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"disable_finish_ramp command")
         self.finish_ramp = 0
-        self.set_axis()
+        return self.set_axis()
 
     def enable_line_polarity_0_volts(self):
         """
@@ -949,7 +962,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"enable_line_polarity_0_volts command")
         self.enable_line_polarity = 0
-        self.set_axis()
+        return self.set_axis()
 
     def enable_line_polarity_5_volts(self):
         """
@@ -958,7 +971,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"enable_line_polarity_5_volts command")
         self.enable_line_polarity = 1
-        self.set_axis()
+        return self.set_axis()
 
     def set_auto_direction_change(self):
         """
@@ -1004,6 +1017,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"set_auto_direction_change command: {command}")
         self.send_command(command=command)
+        return command
 
     def set_auto_count_pulse_out(self):
         """
@@ -1095,6 +1109,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"set_auto_count_pulse_out command: {command}")
         self.send_command(command=command)
+        return command
 
     def start(self):
         """
@@ -1131,6 +1146,7 @@ class Axis(PTHat):
         command = f"{self.command_type}{self.command_id:02}{self.__start_axis_command}{self.axis}" \
                   f"{self._command_end}"
         self.__start(command=command)
+        return command
 
     def start_all(self):
         """
@@ -1138,7 +1154,7 @@ class Axis(PTHat):
 
         Byte1	Byte 2-3	Byte 4-5	Byte 6
         ---------------------------------------------------------------------------------------------------------------
-        I	    00	        SX	        *
+        I	    00	        SA	        *
 
         Command breakdown:
 
@@ -1164,9 +1180,10 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00SX*	    RI00SY*	    RI00SZ*	    RI00SE*	    RI00SA*	    CI00SX*	    CI00SY*	    CI00SZ*	    CI00SE*
         """
-        command = f"{self.command_type}{self.command_id:02}{self.__start_all_axis_command}{self.axis}" \
+        command = f"{self.command_type}{self.command_id:02}{self.__start_all_axis_command}" \
                   f"{self._command_end}"
         self.__start(command=command)
+        return command
 
     def __start(self, command):
         """
@@ -1245,6 +1262,7 @@ class Axis(PTHat):
         """
         command = f"{self.command_type}{self.command_id:02}{self.__stop_axis_command}{self.axis}{self._command_end}"
         self.__stop(command=command)
+        return command
 
     def stop_all(self):
         """
@@ -1254,7 +1272,7 @@ class Axis(PTHat):
 
         Byte1	Byte 2-3	Byte 4-5	Byte 6
         ---------------------------------------------------------------------------------------------------------------
-        I	    00	        TX	        *
+        I	    00	        TA	        *
 
         Command breakdown:
 
@@ -1280,9 +1298,10 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00TX*	    RI00TY*	    RI00TZ*	    RI00TE*	    RI00TA*	    CI00SX*	    CI00SY*	    CI00SZ*	    CI00SE*
         """
-        command = f"{self.command_type}{self.command_id:02}{self.__stop_all_axis_command}{self.axis}" \
+        command = f"{self.command_type}{self.command_id:02}{self.__stop_all_axis_command}" \
                   f"{self._command_end}"
         self.__stop(command=command)
+        return command
 
     def __stop(self, command):
         """
@@ -1393,6 +1412,7 @@ class Axis(PTHat):
                   f"{self.pause_all_return_x_pulse_count}{self.pause_all_return_y_pulse_count}" \
                   f"{self.pause_all_return_z_pulse_count}{self.pause_all_return_e_pulse_count}{self._command_end}"
         self.__pause(command=command)
+        return command
 
     def pause_all(self):
         """
@@ -1401,7 +1421,7 @@ class Axis(PTHat):
 
         Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7	Byte 8	Byte 9	Byte 10
         ---------------------------------------------------------------------------------------------------------------
-        I	    00	        PX	        1	    0	    0	    0	    *
+        I	    00	        PA	        1	    0	    0	    0	    *
 
         Command breakdown:
 
@@ -1456,10 +1476,11 @@ class Axis(PTHat):
         0000000000-     0000000000-     0000000000-     0000000000-     0000000000-
         4294967295      4294967295      4294967295      4294967295      4294967295
         """
-        command = f"{self.command_type}{self.command_id:02}{self.__pause_resume_all_axis_command}{self.axis}" \
+        command = f"{self.command_type}{self.command_id:02}{self.__pause_resume_all_axis_command}" \
                   f"{self.pause_all_return_x_pulse_count}{self.pause_all_return_y_pulse_count}" \
                   f"{self.pause_all_return_z_pulse_count}{self.pause_all_return_e_pulse_count}{self._command_end}"
         self.__pause(command=command)
+        return command
 
     def __pause(self, command):
         """
@@ -1600,6 +1621,7 @@ class Axis(PTHat):
                   f"{self.pause_all_return_x_pulse_count}{self.pause_all_return_y_pulse_count}" \
                   f"{self.pause_all_return_z_pulse_count}{self.pause_all_return_e_pulse_count}{self._command_end}"
         self.__resume(command=command)
+        return command
 
     def resume_all(self):
         """
@@ -1649,10 +1671,11 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         CI00PX*	        CI00PY*	        CI00PZ*	        CI00PE*	        CI00PA*
         """
-        command = f"{self.command_type}{self.command_id:02}{self.__pause_resume_all_axis_command}{self.axis}" \
+        command = f"{self.command_type}{self.command_id:02}{self.__pause_resume_all_axis_command}" \
                   f"{self.pause_all_return_x_pulse_count}{self.pause_all_return_y_pulse_count}" \
                   f"{self.pause_all_return_z_pulse_count}{self.pause_all_return_e_pulse_count}{self._command_end}"
         self.__resume(command=command)
+        return command
 
     def __resume(self, command):
         """
@@ -1776,6 +1799,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"get_current_pulse_count command: {command}")
         self.send_command(command=command)
+        return command
 
     def change_speed(self, frequency):
         """
@@ -1818,10 +1842,11 @@ class Axis(PTHat):
 
         self.frequency = frequency
         command = f"{self.command_type}{self.command_id:02}{self.__change_axis_speed_command}{self.axis}" \
-                  f"{self.frequency}{self._command_end}"
+                  f"{self.frequency:010.3f}{self._command_end}"
         if self.debug:
             print(f"change_speed command: {command}")
         self.send_command(command=command)
+        return command
 
     def enable_limit_switches(self):
         """
@@ -1865,6 +1890,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"enable_limit_switches command: {command}")
         self.send_command(command=command)
+        return command
 
     def disable_limit_switches(self):
         """
@@ -1873,7 +1899,7 @@ class Axis(PTHat):
 
         Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7
         ---------------------------------------------------------------------------------------------------------------
-        I	    00	        KX	        1	    *
+        I	    00	        KX	        0	    *
 
         Command breakdown:
 
@@ -1908,6 +1934,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"disable_limit_switches command: {command}")
         self.send_command(command=command)
+        return command
 
     def enable_emergency_stop(self):
         """
@@ -1916,7 +1943,7 @@ class Axis(PTHat):
 
         Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7
         ---------------------------------------------------------------------------------------------------------------
-        I	    00	        KX	        1	    *
+        I	    00	        KS	        1	    *
 
         Command breakdown:
 
@@ -1951,6 +1978,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"enable_emergency_stop command: {command}")
         self.send_command(command=command)
+        return command
 
     def disable_emergency_stop(self):
         """
@@ -1994,6 +2022,7 @@ class Axis(PTHat):
         if self.debug:
             print(f"disable_emergency_stop command: {command}")
         self.send_command(command=command)
+        return command
 
     def reset(self):
         """
@@ -2095,6 +2124,7 @@ class ADC(PTHat):
         if self.debug:
             print(f"get_reading command: {command}")
         self.send_command(command=command)
+        return command
 
     def reset(self):
         """
@@ -2165,6 +2195,7 @@ class AUX(PTHat):
         if self.debug:
             print(f"output_on command: {command}")
         self.send_command(command=command)
+        return command
 
     def output_off(self):
         """
@@ -2172,7 +2203,7 @@ class AUX(PTHat):
 
         Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7
         ---------------------------------------------------------------------------------------------------------------
-        I	    00	        A1	        1	    *
+        I	    00	        A1	        0	    *
 
         Command breakdown:
 
@@ -2206,6 +2237,7 @@ class AUX(PTHat):
         if self.debug:
             print(f"output_off command: {command}")
         self.send_command(command=command)
+        return command
 
     def reset(self):
         """
@@ -2301,6 +2333,7 @@ class PWM(PTHat):
         if self.debug:
             print(f"set_channel command: {command}")
         self.send_command(command=command)
+        return command
 
     def set_frequency(self, frequency):
         """
@@ -2308,7 +2341,7 @@ class PWM(PTHat):
         :param frequency: the new frequency
         """
         self.frequency = frequency
-        self.set_channel()
+        return self.set_channel()
 
     def set_duty_cycle(self, duty_cycle):
         """
@@ -2316,7 +2349,7 @@ class PWM(PTHat):
         :param duty_cycle: the new duty cycle
         """
         self.duty_cycle = duty_cycle
-        self.set_channel()
+        return self.set_channel()
 
     def set_both_channels(self):
         """
@@ -2381,6 +2414,7 @@ class PWM(PTHat):
         if self.debug:
             print(f"set_both_channels command: {command}")
         self.send_command(command=command)
+        return command
 
     def reset(self):
         """

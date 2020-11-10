@@ -1,9 +1,9 @@
-import setuptools
+from setuptools import find_packages, setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setuptools.setup(
+setup(
     name="pthat-drizztguen77",
     version="0.9.0",
     author="Curtis White",
@@ -12,7 +12,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/drizztguen77/PTHat",
-    packages=setuptools.find_packages(),
+    packages=find_packages(include=["pthat", "pthat.*"]),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
