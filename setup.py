@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="pthat-drizztguen77",
-    version="0.9.0",
+    version="0.9.0b1",
     author="Curtis White",
     author_email="drizztguen77@gmail.com",
     description="A package containing the API for the PTHat by CNC Design Limited",
