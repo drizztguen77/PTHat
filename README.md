@@ -52,7 +52,7 @@ To upload the project the first time until a token is obtained. This will prompt
 twine upload dist/*
 ```
 
-To upload the project to pypiTest:
+To upload the project to pypi:
 ```
 twine upload -r pypi dist/*
 ```

@@ -1,22 +1,22 @@
 """
-Pulse Train Hat Python Module
-==============================
+Pulse Train Hat Python API
+==========================
 
-This module contains classes for the Pulse Train Hat module sold by CNC Design Ltd.
+This API contains classes for the Pulse Train Hat module sold by CNC Design Ltd.
 
 This contains :class:'PTHat' class. This class provides all the primary functionality for the serial command interface
 as well as all general commands. It basically builds the commands and sends them to the serial port as specified in
-the command interface at
-http://pthat.com/index.php/command-set/
+the command interface at http://pthat.com/index.php/command-set/
 
-It includes the ability to run both instant and buffered commands
+It includes the ability to run both instant and buffered commands. All commands currently existing for the PTHat
+are included in the API.
 
 It also contains supporting classes for :class:'Axis', :class:'ADC', :class:'AUX' and :class:'PWM' commands. Each of
 the supporting classes extend the PTHat class.
 
 .. code-block:: python
 
-    from winder.pthat import *
+    from pthat import *
 
     <put code here after classes are written>
 """
@@ -32,9 +32,10 @@ class PTHat:
     command_id = 00     # Optional command ID
     debug = False       # Sets debug mode. This just prints additional information
     test_mode = False   # This lets all methods to be run without actually sending them to the serial port
-    wait_delay = 0  # Wait delay between commands - 0-9999 -
+    wait_delay = 0      # Wait delay between commands - 0-9999 -
     #                     Delay in milliseconds: 1000ms = 1 second delay,
     #                     Delay in microseconds: 1000us = 0.001 of a second
+    auto_send_command = False   # Automatically send the command when command methods are called
 
     _motor_enabled = False   # Specifies if the motor is enabled or not. Do not set this as it is set internally
     _received_command_replies_enabled = False    # if received command replies are enabled or not
@@ -57,15 +58,15 @@ class PTHat:
     __start_buffer_command = "Z"       # Start the buffer command
     __buffer_loop_start_command = "W"  # Buffer loop start command
 
-    def __init__(self, test_mode=False):
+    def __init__(self, test_mode=False, serial_device="/dev/serial0", baud_rate=115200):
         """
         Constructor
         """
         super().__init__()
 
-        self.serial_device = "/dev/serial0"  # default to /dev/serial0
-        self.baud_rate = 115200  # default baud rate
-        self._version = "1.0.0"  # Version of this API
+        self.serial_device = serial_device  # default to /dev/serial0
+        self.baud_rate = baud_rate  # default baud rate
+        self._version = "0.9.0"  # Version of this API
         self.test_mode = test_mode
 
         if not test_mode:
@@ -107,6 +108,13 @@ class PTHat:
         Read-only property
         """
         return self._command_end
+
+    @property
+    def version(self):
+        """
+        Read-only property
+        """
+        return self._version
 
     def init_serial_interface(self):
         """
@@ -213,7 +221,8 @@ class PTHat:
         command = f"{self.command_type}{self.command_id:02}{self.__request_port_status_command}{self._command_end}"
         if self.debug:
             print(f"get_io_port_status command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def set_wait_delay(self, period="W", delay=None):
@@ -268,7 +277,8 @@ class PTHat:
                   f"{self.wait_delay:04}{self._command_end}"
         if self.debug:
             print(f"set_wait_delay command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def toggle_motor_enable_line(self):
@@ -304,7 +314,8 @@ class PTHat:
         command = f"{self.command_type}{self.command_id:02}{self.__toggle_motor_enable_line_command}{self._command_end}"
         if self.debug:
             print(f"toggle_motor_enable_line command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def received_command_replies_on(self):
@@ -344,7 +355,8 @@ class PTHat:
                   f"{self._command_end}"
         if self.debug:
             print(f"received_command_replies_on command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def received_command_replies_off(self):
@@ -384,7 +396,8 @@ class PTHat:
                   f"{self._command_end}"
         if self.debug:
             print(f"received_command_replies_off command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def completed_command_replies_on(self):
@@ -424,7 +437,8 @@ class PTHat:
                   f"{self._command_end}"
         if self.debug:
             print(f"completed_command_replies_on command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def completed_command_replies_off(self):
@@ -464,7 +478,8 @@ class PTHat:
                   f"{self._command_end}"
         if self.debug:
             print(f"completed_command_replies_off command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def get_firmware_version(self):
@@ -499,7 +514,8 @@ class PTHat:
         command = f"{self.command_type}{self.command_id:02}{self.__request_firmware_version_command}{self._command_end}"
         if self.debug:
             print(f"get_firmware_version command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def reset(self):
@@ -526,7 +542,8 @@ class PTHat:
         command = f"{self.__reset_pthat_command}{self._command_end}"
         if self.debug:
             print(f"PTHat reset command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
 
         self.wait_delay = 0
         self.command_type = "I"
@@ -576,7 +593,8 @@ class PTHat:
         command = f"{self.__initiate_buffer_command}{self.__buffer_value:04}{self._command_end}"
         if self.debug:
             print(f"initiate_buffer command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def start_buffer(self):
@@ -604,7 +622,8 @@ class PTHat:
         command = f"{self.__start_buffer_command}{self.__buffer_value:04}{self._command_end}"
         if self.debug:
             print(f"start_buffer command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def start_buffer_loop(self):
@@ -635,7 +654,8 @@ class PTHat:
         command = f"{self.__buffer_loop_start_command}{self.__buffer_value:04}{self._command_end}"
         if self.debug:
             print(f"start_buffer_loop command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def rpm_to_frequency(self, rpm, steps_per_rev, round_digits):
@@ -713,6 +733,23 @@ class PTHat:
         if self.debug:
             print(f"frequency_to_rpm frequency: {frequency} = rpm: {rpm}")
         return rpm
+
+    def calculate_pulse_count(self, steps_per_rev, total_revs):
+        """
+        Calculates the pulse count from the steps per revolution and the total revolutions desired.
+
+        Calculation is
+
+        pulse count = steps per rev * total revs
+
+        :param steps_per_rev: steps per revolution
+        :param total_revs: total revolutions desired
+        :return: pulse count
+        """
+        pulse_cnt = steps_per_rev * total_revs
+        if self.debug:
+            print(f"pulse count: {pulse_cnt} = {steps_per_rev} steps per revolution * {total_revs} total revolutions")
+        return pulse_cnt
 
     def _validate_command(self):
         """
@@ -833,8 +870,8 @@ class Axis(PTHat):
                                             0=No ramp
                                             1=Ramp
         Byte 29-31	0-255	                Ramp divide. This will divide the target frequency by this value for
-                                            each ramp increment.
-        Byte 32-34	0-255	                Ramp pause between each ramp increment.,
+                                            each ramp increment
+        Byte 32-34	0-255	                Ramp pause between each ramp increment
         Byte 35	    0-2	                    Link to ADC
                                             0=No ADC
                                             1=Link to ADC1
@@ -898,7 +935,8 @@ class Axis(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"set_axis command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def set_direction_forward(self):
@@ -1016,7 +1054,8 @@ class Axis(PTHat):
                   f"{self.pulse_count_change_direction:010}{self._command_end}"
         if self.debug:
             print(f"set_auto_direction_change command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def set_auto_count_pulse_out(self):
@@ -1108,7 +1147,8 @@ class Axis(PTHat):
                   f"{self.enable_disable_e_pulse_count_replies}{self._command_end}"
         if self.debug:
             print(f"set_auto_count_pulse_out command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def start(self):
@@ -1223,7 +1263,9 @@ class Axis(PTHat):
         if not self.__started:
             if self.debug:
                 print(f"Axis start command: {command}")
-            self.send_command(command=command)
+            if self.auto_send_command:
+                self.send_command(command=command)
+
             self.__started = True
 
     def stop(self):
@@ -1343,7 +1385,9 @@ class Axis(PTHat):
         if self.__started:
             if self.debug:
                 print(f"Axis stop command: {command}")
-            self.send_command(command=command)
+            if self.auto_send_command:
+                self.send_command(command=command)
+
             self.__started = False
 
     def pause(self):
@@ -1566,7 +1610,9 @@ class Axis(PTHat):
         if not self.__paused:
             if self.debug:
                 print(f"Axis pause command: {command}")
-            self.send_command(command=command)
+            if self.auto_send_command:
+                self.send_command(command=command)
+
             self.__paused = True
 
     def resume(self):
@@ -1747,7 +1793,9 @@ class Axis(PTHat):
         if self.__paused:
             if self.debug:
                 print(f"Axis resume command: {command}")
-            self.send_command(command=command)
+            if self.auto_send_command:
+                self.send_command(command=command)
+
             self.__paused = False
 
     def get_current_pulse_count(self):
@@ -1798,7 +1846,8 @@ class Axis(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"get_current_pulse_count command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def change_speed(self, frequency):
@@ -1845,7 +1894,8 @@ class Axis(PTHat):
                   f"{self.frequency:010.3f}{self._command_end}"
         if self.debug:
             print(f"change_speed command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def enable_limit_switches(self):
@@ -1889,7 +1939,8 @@ class Axis(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"enable_limit_switches command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def disable_limit_switches(self):
@@ -1933,7 +1984,8 @@ class Axis(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"disable_limit_switches command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def enable_emergency_stop(self):
@@ -1977,7 +2029,8 @@ class Axis(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"enable_emergency_stop command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def disable_emergency_stop(self):
@@ -2021,7 +2074,8 @@ class Axis(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"disable_emergency_stop command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def reset(self):
@@ -2123,7 +2177,8 @@ class ADC(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"get_reading command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def reset(self):
@@ -2194,7 +2249,8 @@ class AUX(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"output_on command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def output_off(self):
@@ -2236,7 +2292,8 @@ class AUX(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"output_off command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def reset(self):
@@ -2332,7 +2389,8 @@ class PWM(PTHat):
                   f"{self.frequency:07}{self.duty_cycle:05}{self._command_end}"
         if self.debug:
             print(f"set_channel command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def set_frequency(self, frequency):
@@ -2413,7 +2471,8 @@ class PWM(PTHat):
                   f"{self._command_end}"
         if self.debug:
             print(f"set_both_channels command: {command}")
-        self.send_command(command=command)
+        if self.auto_send_command:
+            self.send_command(command=command)
         return command
 
     def reset(self):

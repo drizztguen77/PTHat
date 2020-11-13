@@ -8,10 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - New API for the PTHat
+- version read only property.
+- auto_send_command variable
+- method to calculate pulse count
 
-##  [0.9.3a1]
-- Added new setup files and uploaded project to PyPI
+##  [0.9.0]
+### Added
+- new setup files and uploaded project to PyPI
 
 
-[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.9.3a1...HEAD
-[0.9.3a1]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.0.0...v0.9.3a1
+[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.0.0...v0.9.0

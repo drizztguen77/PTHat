@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="pthat",
-    version="0.9.3a1",
-    packages=find_packages(exclude=("tests",)),
+    version="0.9.0",
+    packages=find_packages(exclude=("tests", "examples")),
     python_requires='>=3.6',
 )
