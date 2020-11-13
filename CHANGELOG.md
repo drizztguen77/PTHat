@@ -12,10 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - auto_send_command variable
 - method to calculate pulse count
 
-##  [0.9.0]
+##  [0.9.1]
 ### Added
 - new setup files and uploaded project to PyPI
 
 
-[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.9.0...HEAD
-[0.9.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.0.0...v0.9.0
+[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.0.0...v0.9.1
