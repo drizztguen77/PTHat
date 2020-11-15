@@ -8,33 +8,34 @@ This example does not auto send the commands. It gets the command and then sends
 from pthat.pthat import Axis
 import time
 
-
-response_string = ""
+response_size = 7
 
 
 def show_responses(axis):
+    responses = []
     # Get the responses
-    resp = get_responses(axis, response_string)
-    while resp is None or resp == "":
-        resp += get_responses(axis, response_string)
+    resp = get_response(axis)
+    while resp is not None:
+        responses.append(resp)
+        resp = get_response(axis)
 
     # Parse the responses
-    print(resp)
+    print(responses)
     if resp is not None:
         xaxis.parse_responses(resp)
     else:
         print("No responses received")
 
 
-def get_responses(axis, resp_string):
+def get_response(axis):
     """
     This method gets the responses from the serial port. It calls a callback method that can
     be implemented to do whatever is needed based on the response.
     """
-    responses = None
+    resp_string = None
     if not axis.test_mode:
-        response_waiting_size = 0
-        while axis.serial.in_waiting <= 7:
+        response_waiting_size = axis.serial.in_waiting
+        while 0 < response_waiting_size <= response_size:
             response_waiting_size = axis.serial.in_waiting
 
         if response_waiting_size:
@@ -43,16 +44,10 @@ def get_responses(axis, resp_string):
             # read serial buffer
             response_bytes = axis.serial.read(response_waiting_size)
             # convert bytes to string
-            resp_string += response_bytes.decode()
-            # Find the end of the response
-            response_index = resp_string.rfind(axis._command_end)
-            # create list of responses
-            responses = resp_string[0:response_index].split(axis._command_end)
-            # add incomplete response for next check
-            resp_string = resp_string[response_index:]
-            print(resp_string)
+            resp_string = response_bytes.decode()
+            print(f"resp_string : {resp_string}")
 
-    return responses
+    return resp_string
 
 
 xaxis = Axis("X")
@@ -65,5 +60,5 @@ firmware_version_cmd = xaxis.get_firmware_version()
 xaxis.send_command(firmware_version_cmd)
 
 # Show the responses
-# time.sleep(1)
+time.sleep(1)
 show_responses(xaxis)
