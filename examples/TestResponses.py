@@ -53,10 +53,10 @@ def get_responses(axis):
                 # add incomplete response for next check
                 resp_string = resp_string[response_index:]
                 print(f"Incomplete bytes: {resp_string}")
-            else:
-                # See if there is any more to read
-                response_waiting_size = axis.serial.in_waiting
-                print(f"Remaining bytes waiting: {response_waiting_size}")
+
+            # See if there is any more to read
+            response_waiting_size = axis.serial.in_waiting
+            print(f"Remaining bytes waiting: {response_waiting_size}")
 
     return responses
 
