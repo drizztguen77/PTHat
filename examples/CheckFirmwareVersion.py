@@ -6,6 +6,7 @@ This example does not auto send the commands. It gets the command and then sends
 
 """
 from pthat.pthat import Axis
+import time
 
 
 def show_responses():
@@ -29,4 +30,5 @@ firmware_version_cmd = xaxis.get_firmware_version()
 xaxis.send_command(firmware_version_cmd)
 
 # Show the responses
+time.sleep(1)
 show_responses()
