@@ -71,5 +71,5 @@ firmware_version_cmd = xaxis.get_firmware_version()
 xaxis.send_command(firmware_version_cmd)
 
 # Show the responses
-time.sleep(1)
+#time.sleep(1)
 show_responses(xaxis)
