@@ -9,11 +9,14 @@ from pthat.pthat import Axis
 import time
 
 
+response_string = ""
+
+
 def show_responses(axis):
     # Get the responses
-    resp = get_responses(axis)
+    resp = get_responses(axis, response_string)
     while resp is None or resp == "":
-        resp += get_responses(axis)
+        resp += get_responses(axis, response_string)
 
     # Parse the responses
     print(resp)
@@ -23,7 +26,7 @@ def show_responses(axis):
         print("No responses received")
 
 
-def get_responses(axis):
+def get_responses(axis, resp_string):
     """
     This method gets the responses from the serial port. It calls a callback method that can
     be implemented to do whatever is needed based on the response.
@@ -31,22 +34,23 @@ def get_responses(axis):
     responses = None
     if not axis.test_mode:
         response_waiting_size = 0
-        while axis.__serial.in_waiting < 7:
-            response_waiting_size = axis.__serial.in_waiting
+        while axis.serial_device.in_waiting < 7:
+            response_waiting_size = axis.serial_device.in_waiting
 
         if response_waiting_size:
             if axis.debug:
                 print(f"response waiting size: {response_waiting_size}")
             # read serial buffer
-            response_bytes = axis.__serial.read(response_waiting_size)
+            response_bytes = axis.serial_device.read(response_waiting_size)
             # convert bytes to string
-            axis.__response_string += response_bytes.decode()
+            resp_string += response_bytes.decode()
             # Find the end of the response
-            response_index = axis.__response_string.rfind(axis._command_end)
+            response_index = resp_string.rfind(axis._command_end)
             # create list of responses
-            responses = axis.__response_string[0:response_index].split(axis._command_end)
+            responses = resp_string[0:response_index].split(axis._command_end)
             # add incomplete response for next check
-            axis.__response_string = axis.__response_string[response_index:]
+            resp_string = resp_string[response_index:]
+
     return responses
 
 
