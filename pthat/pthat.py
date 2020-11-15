@@ -154,6 +154,8 @@ class PTHat:
         responses = None
         if not self.test_mode:
             response_waiting_size = self.__serial.in_waiting
+            if self.debug:
+                print(f"response waiting size: {response_waiting_size}")
             if response_waiting_size:
                 # read serial buffer
                 response_bytes = self.__serial.read(response_waiting_size)
@@ -173,11 +175,12 @@ class PTHat:
         some responses may come from the other classes such as Axis or AUX.
         :param responses: list of responses
         """
-        for resp in responses:
-            if resp != "":
-                if self.debug:
-                    print(f"Response: {resp}")
-            # TODO finish this parsing
+        if responses is not None:
+            for resp in responses:
+                if resp != "":
+                    if self.debug:
+                        print(f"Response: {resp}")
+                # TODO finish this parsing
 
     def get_io_port_status(self):
         """
