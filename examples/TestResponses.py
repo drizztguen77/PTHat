@@ -34,14 +34,14 @@ def get_responses(axis, resp_string):
     responses = None
     if not axis.test_mode:
         response_waiting_size = 0
-        while axis.serial_device.in_waiting < 7:
-            response_waiting_size = axis.serial_device.in_waiting
+        while axis.serial.in_waiting < 7:
+            response_waiting_size = axis.serial.in_waiting
 
         if response_waiting_size:
             if axis.debug:
                 print(f"response waiting size: {response_waiting_size}")
             # read serial buffer
-            response_bytes = axis.serial_device.read(response_waiting_size)
+            response_bytes = axis.serial.read(response_waiting_size)
             # convert bytes to string
             resp_string += response_bytes.decode()
             # Find the end of the response
@@ -50,6 +50,7 @@ def get_responses(axis, resp_string):
             responses = resp_string[0:response_index].split(axis._command_end)
             # add incomplete response for next check
             resp_string = resp_string[response_index:]
+            print(resp_string)
 
     return responses
 
