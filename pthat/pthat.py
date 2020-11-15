@@ -36,6 +36,7 @@ class PTHat:
     #                     Delay in milliseconds: 1000ms = 1 second delay,
     #                     Delay in microseconds: 1000us = 0.001 of a second
     auto_send_command = False   # Automatically send the command when command methods are called
+    serial_device = None     # The serial device
 
     _motor_enabled = False   # Specifies if the motor is enabled or not. Do not set this as it is set internally
     _received_command_replies_enabled = False    # if received command replies are enabled or not
@@ -66,11 +67,12 @@ class PTHat:
 
         self.serial_device = serial_device  # default to /dev/serial0
         self.baud_rate = baud_rate  # default baud rate
-        self._version = "0.9.2"  # Version of this API
+        self._version = "0.9.3"  # Version of this API
         self.test_mode = test_mode
 
         if not test_mode:
             self.__serial = self.init_serial_interface()  # create serial port object and open it
+            self.serial_device = self.__serial
 
     def __del__(self):
         """
