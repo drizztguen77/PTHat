@@ -12,7 +12,7 @@ import time
 def show_responses():
     # Get the responses
     resp = xaxis.get_responses()
-    while resp is None:
+    while resp is None or resp == "":
         print("checking response")
         resp = xaxis.get_responses()
 

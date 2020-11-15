@@ -66,7 +66,7 @@ class PTHat:
 
         self.serial_device = serial_device  # default to /dev/serial0
         self.baud_rate = baud_rate  # default baud rate
-        self._version = "0.9.1"  # Version of this API
+        self._version = "0.9.2"  # Version of this API
         self.test_mode = test_mode
 
         if not test_mode:
