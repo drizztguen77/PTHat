@@ -12,6 +12,8 @@ import time
 def show_responses():
     # Get the responses
     resp = xaxis.get_responses()
+    while resp is None:
+        resp = xaxis.get_responses()
 
     # Parse the responses
     if resp is not None:
@@ -30,5 +32,5 @@ firmware_version_cmd = xaxis.get_firmware_version()
 xaxis.send_command(firmware_version_cmd)
 
 # Show the responses
-time.sleep(1)
+# time.sleep(1)
 show_responses()

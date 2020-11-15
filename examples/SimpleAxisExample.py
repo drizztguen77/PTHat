@@ -6,6 +6,7 @@ This example does not auto send the commands. It gets the command and then sends
 
 """
 from pthat.pthat import Axis
+import time
 
 
 def show_responses():
@@ -26,13 +27,7 @@ rpm = int(input("How many RPMs [200]? ") or "200")
 xaxis = Axis("X")
 xaxis.command_id = 1
 xaxis.debug = True
-
-# Get the firmware version
-firmware_version_cmd = xaxis.get_firmware_version()
-xaxis.send_command(firmware_version_cmd)
-
-# Show the responses
-show_responses()
+xaxis.serial_device = "/dev/ttyS0"
 
 # Setup the axis with values to start the motor
 xaxis.frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
