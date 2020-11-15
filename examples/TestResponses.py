@@ -13,16 +13,18 @@ response_size = 7
 
 def show_responses(axis):
     responses = []
-    # Get the responses
-    resp = get_responses(axis)
-    while resp is not None:
-        responses.extend(resp)
+    t_end = time.time() + 1     # Add 1 second, no need to wait longer than that
+    while time.time() < t_end:
+        # Get the responses
         resp = get_responses(axis)
+        while resp is not None:
+            responses.extend(resp)
+            resp = get_responses(axis)
 
     # Parse the responses
     print(responses)
-    if resp is not None:
-        xaxis.parse_responses(resp)
+    if responses is not None:
+        xaxis.parse_responses(responses)
     else:
         print("No responses received")
 
