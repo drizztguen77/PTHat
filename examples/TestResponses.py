@@ -14,10 +14,10 @@ response_size = 7
 def show_responses(axis):
     responses = []
     # Get the responses
-    resp = get_response(axis)
+    resp = get_responses(axis)
     while resp is not None:
         responses.append(resp)
-        resp = get_response(axis)
+        resp = get_responses(axis)
 
     # Parse the responses
     print(responses)
@@ -27,27 +27,33 @@ def show_responses(axis):
         print("No responses received")
 
 
-def get_response(axis):
+def get_responses(axis):
     """
     This method gets the responses from the serial port. It calls a callback method that can
     be implemented to do whatever is needed based on the response.
     """
-    resp_string = None
+    resp_string = ""
+    responses = None
     if not axis.test_mode:
         response_waiting_size = axis.serial.in_waiting
-        while 0 < response_waiting_size <= response_size:
-            response_waiting_size = axis.serial.in_waiting
-
-        if response_waiting_size:
+        while response_waiting_size > 0:
             if axis.debug:
                 print(f"response waiting size: {response_waiting_size}")
             # read serial buffer
-            response_bytes = axis.serial.read(response_waiting_size)
+            response_bytes = axis.serial.read(response_waiting_size or 1)
             # convert bytes to string
-            resp_string = response_bytes.decode()
+            resp_string += response_bytes.decode()
             print(f"resp_string : {resp_string}")
 
-    return resp_string
+            # Find the end of the response
+            response_index = resp_string.rfind(axis._command_end)
+            if response_index >= 0:
+                # create list of responses
+                responses = resp_string[0:response_index].split(axis._command_end)
+                # add incomplete response for next check
+                resp_string = resp_string[response_index:]
+
+    return responses
 
 
 xaxis = Axis("X")
