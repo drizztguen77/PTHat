@@ -16,7 +16,7 @@ def show_responses(axis):
     # Get the responses
     resp = get_responses(axis)
     while resp is not None:
-        responses.append(resp)
+        responses.extend(resp)
         resp = get_responses(axis)
 
     # Parse the responses
