@@ -22,6 +22,7 @@ def show_responses():
 xaxis = Axis("X")
 xaxis.command_id = 1
 xaxis.debug = True
+xaxis.serial_device = "/dev/ttyS0"
 
 # Get the firmware version
 firmware_version_cmd = xaxis.get_firmware_version()
