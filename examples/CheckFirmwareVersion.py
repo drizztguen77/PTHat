@@ -13,6 +13,7 @@ def show_responses():
     # Get the responses
     resp = xaxis.get_responses()
     while resp is None:
+        print("checking response")
         resp = xaxis.get_responses()
 
     # Parse the responses
