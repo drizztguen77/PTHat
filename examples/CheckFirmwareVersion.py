@@ -17,10 +17,11 @@ def show_responses():
         resp = xaxis.get_responses()
 
     # Parse the responses
+    print(resp)
     if resp is not None:
         xaxis.parse_responses(resp)
     else:
-        print(f"No responses received")
+        print("No responses received")
 
 
 xaxis = Axis("X")
