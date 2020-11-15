@@ -34,7 +34,7 @@ def get_responses(axis, resp_string):
     responses = None
     if not axis.test_mode:
         response_waiting_size = 0
-        while axis.serial.in_waiting < 7:
+        while axis.serial.in_waiting <= 7:
             response_waiting_size = axis.serial.in_waiting
 
         if response_waiting_size:
