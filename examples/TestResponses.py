@@ -41,7 +41,7 @@ def get_response(axis):
     resp_string = None
 
     # read serial buffer in bytes
-    response_bytes = axis.serial.read_until(expected="*")
+    response_bytes = axis.serial.read_until(axis._command_end.encode())
 
     if response_bytes is not None and len(response_bytes) > 0:
         # convert bytes to string
