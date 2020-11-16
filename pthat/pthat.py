@@ -28,7 +28,7 @@ class PTHat:
     This is the main Pulse Train Hat class. It is used to run commands against the PTHat and to run general commands.
     """
     # Properties
-    _version = "0.9.5"  # Version of this API
+    _version = "0.9.6"  # Version of this API
     command_type = "I"  # I = Instant or B = Buffer
     command_id = 00     # Optional command ID
     debug = False       # Sets debug mode. This just prints additional information
@@ -176,7 +176,6 @@ class PTHat:
         if response_bytes is not None and len(response_bytes) > 0:
             # convert bytes to string
             resp_string = response_bytes.decode()
-            print(f"resp_string : {resp_string}")
 
         return resp_string
 
