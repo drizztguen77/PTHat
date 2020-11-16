@@ -66,7 +66,7 @@ xaxis.parse_responses(responses)
 xaxis.send_command(xaxis.get_current_pulse_count())
 
 # The response should come back with 3 replies
-pulse_reply = f"XP0{xaxis.pulse_count:010}*"
+pulse_reply = f"XP{xaxis.direction}{xaxis.pulse_count:010}*"
 responses = xaxis.get_all_responses()
 print(f"pulse count responses: {responses}")
 print(f"looking for pulse reply: {pulse_reply}")
