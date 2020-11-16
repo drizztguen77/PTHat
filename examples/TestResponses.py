@@ -8,18 +8,22 @@ This example does not auto send the commands. It gets the command and then sends
 from pthat.pthat import Axis
 import time
 
-response_size = 7
-
 
 def show_responses(axis):
     responses = []
-    t_end = time.time() + 1     # Add 1 second, no need to wait longer than that
-    while time.time() < t_end:
-        # Get the responses
-        resp = get_responses(axis)
-        while resp is not None:
-            responses.extend(resp)
-            resp = get_responses(axis)
+    # t_end = time.time() + 1     # Add 1 second, no need to wait longer than that
+    # while time.time() < t_end:
+    #     # Get the responses
+    #     resp = get_responses(axis)
+    #     while resp is not None:
+    #         responses.extend(resp)
+    #         resp = get_responses(axis)
+
+    # Get the responses
+    resp = get_response(axis)
+    while resp is not None:
+        responses.extend(resp)
+        resp = get_response(axis)
 
     # Parse the responses
     print(responses)
@@ -29,11 +33,30 @@ def show_responses(axis):
         print("No responses received")
 
 
+def get_response(axis):
+    """
+    This method gets the responses from the serial port. It calls a callback method that can
+    be implemented to do whatever is needed based on the response.
+    """
+    resp_string = None
+
+    # read serial buffer in bytes
+    response_bytes = axis.serial.read_until(expected="*")
+
+    if response_bytes is not None and len(response_bytes) > 0:
+        # convert bytes to string
+        resp_string = response_bytes.decode()
+        print(f"resp_string : {resp_string}")
+
+    return resp_string
+
+
 def get_responses(axis):
     """
     This method gets the responses from the serial port. It calls a callback method that can
     be implemented to do whatever is needed based on the response.
     """
+    # start reading until an * is received and return it
     resp_string = ""
     responses = None
     if not axis.test_mode:
