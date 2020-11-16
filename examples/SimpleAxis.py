@@ -12,7 +12,6 @@ def show_responses(axis):
     resps = axis.get_all_responses()
 
     # Parse the responses
-    print(resps)
     if resps is not None:
         xaxis.parse_responses(resps)
     else:
