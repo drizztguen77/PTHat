@@ -6,19 +6,15 @@ This example does not auto send the commands. It gets the command and then sends
 
 """
 from pthat.pthat import Axis
-import time
 
 
-def show_responses():
-    # Get the responses
-    resp = xaxis.get_responses()
-    while resp is None or resp == "":
-        resp += xaxis.get_responses()
+def show_responses(axis):
+    responses = axis.get_all_responses()
 
     # Parse the responses
-    print(resp)
-    if resp is not None:
-        xaxis.parse_responses(resp)
+    print(responses)
+    if responses is not None:
+        xaxis.parse_responses(responses)
     else:
         print("No responses received")
 
@@ -33,5 +29,4 @@ firmware_version_cmd = xaxis.get_firmware_version()
 xaxis.send_command(firmware_version_cmd)
 
 # Show the responses
-time.sleep(1)
-show_responses()
+show_responses(xaxis)

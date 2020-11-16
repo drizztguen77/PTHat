@@ -28,6 +28,7 @@ class PTHat:
     This is the main Pulse Train Hat class. It is used to run commands against the PTHat and to run general commands.
     """
     # Properties
+    _version = "0.9.5"  # Version of this API
     command_type = "I"  # I = Instant or B = Buffer
     command_id = 00     # Optional command ID
     debug = False       # Sets debug mode. This just prints additional information
@@ -67,7 +68,6 @@ class PTHat:
 
         self.serial_device = serial_device  # default to /dev/serial0
         self.baud_rate = baud_rate  # default baud rate
-        self._version = "0.9.4"  # Version of this API
         self.test_mode = test_mode
 
         if not test_mode:
@@ -147,29 +147,38 @@ class PTHat:
         if not self.test_mode:
             self.__serial.write(bytes(command, 'utf-8'))
 
-    def get_responses(self):
+    def get_all_responses(self):
         """
-        This method gets the responses from the serial port. It calls a callback method that can
-        be implemented to do whatever is needed based on the response.
+        This method gets all responses until no more can be returned
+        :return: a list of responses
         """
-        # TODO make asynchronous maybe and implement callback
-        responses = None
-        if not self.test_mode:
-            response_waiting_size = self.__serial.in_waiting
-            if self.debug:
-                print(f"response waiting size: {response_waiting_size}")
-            if response_waiting_size:
-                # read serial buffer
-                response_bytes = self.__serial.read(response_waiting_size)
-                # convert bytes to string
-                self.__response_string += response_bytes.decode()
-                # Find the end of the response
-                response_index = self.__response_string.rfind(self._command_end)
-                # create list of responses
-                responses = self.__response_string[0:response_index].split(self._command_end)
-                # add incomplete response for next check
-                self.__response_string = self.__response_string[response_index:]
+        # TODO make asynchronous maybe and implement callback that the responses are sent to
+        responses = []
+
+        # Get all the responses
+        resp = self.get_response()
+        while resp is not None:
+            responses.append(resp)
+            resp = self.get_response()
+
         return responses
+
+    def get_response(self):
+        """
+        This method gets a single response. A response is the value returned up to an *.
+        :return a single response as a string
+        """
+        resp_string = None
+
+        # read serial buffer in bytes
+        response_bytes = self.__serial.read_until(self._command_end.encode())
+
+        if response_bytes is not None and len(response_bytes) > 0:
+            # convert bytes to string
+            resp_string = response_bytes.decode()
+            print(f"resp_string : {resp_string}")
+
+        return resp_string
 
     def parse_responses(self, responses):
         """

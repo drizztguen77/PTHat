@@ -6,18 +6,17 @@ This example does not auto send the commands. It gets the command and then sends
 
 """
 from pthat.pthat import Axis
-import time
 
 
-def show_responses():
-    # Get the responses
-    resp = xaxis.get_responses()
+def show_responses(axis):
+    resps = axis.get_all_responses()
 
     # Parse the responses
-    if resp is not None:
-        xaxis.parse_responses(resp)
+    print(resps)
+    if resps is not None:
+        xaxis.parse_responses(resps)
     else:
-        print(f"No responses received")
+        print("No responses received")
 
 
 steps_per_rev = int(input("How many steps per revolution [400]? ") or "400")
@@ -43,26 +42,26 @@ set_axis_cmd = xaxis.set_axis()
 xaxis.send_command(set_axis_cmd)
 
 # Get the responses - look for both responses to be returned before continuing
-responses = xaxis.get_responses()
+responses = xaxis.get_all_responses()
 while not all(x in responses for x in ["RI01CX*", "CI01CX*"]):
-    responses = responses + xaxis.get_responses()
+    responses = responses + xaxis.get_all_responses()
 
 # Start the motor
 xaxis.send_command(xaxis.start())
 
 # Check for both reply and complete responses to be returned
-responses = xaxis.get_responses()
+responses = xaxis.get_all_responses()
 while not all(x in responses for x in ["RI01SX*", "CI01SX*"]):
-    responses = responses + xaxis.get_responses()
+    responses = responses + xaxis.get_all_responses()
 
 # Get the pulse count
 xaxis.send_command(xaxis.get_current_pulse_count())
 
 # The response should come back with 3 replies
 pulse_reply = f"XP0{xaxis.pulse_count:010}*"
-responses = xaxis.get_responses()
+responses = xaxis.get_all_responses()
 while not all(x in responses for x in ["RI01XP*", pulse_reply, "CI01XP*"]):
-    responses = responses + xaxis.get_responses()
+    responses = responses + xaxis.get_all_responses()
 
 # Print the responses
 xaxis.parse_responses(responses)
