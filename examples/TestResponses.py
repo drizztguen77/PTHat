@@ -56,7 +56,10 @@ def get_responses(axis):
 
                 responses.extend(resp_string[0:response_index].split(axis._command_end))
                 # add incomplete response for next check
-                resp_string = resp_string[response_index:]
+                if resp_string[response_index] == axis._command_end:
+                    resp_string = resp_string[response_index + 1:]
+                else:
+                    resp_string = resp_string[response_index:]
                 print(f"Incomplete bytes: {resp_string}")
 
             # See if there is any more to read
