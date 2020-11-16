@@ -21,7 +21,7 @@ def show_responses(axis):
 steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
 total_revolutions = int(input("How many total revolutions [50]? ") or "50")
 rpm = int(input("How many RPMs [500]? ") or "500")
-direction = int(input("Direction (Forward = 0, Reverse = 1) [0]") or "0")
+direction = int(input("Direction (Forward = 0, Reverse = 1) [0]? ") or "0")
 
 xaxis = Axis("X")
 xaxis.command_id = 1
@@ -68,8 +68,10 @@ xaxis.send_command(xaxis.get_current_pulse_count())
 # The response should come back with 3 replies
 pulse_reply = f"XP0{xaxis.pulse_count:010}*"
 responses = xaxis.get_all_responses()
+print(f"pulse count responses: {responses}")
 while not all(x in responses for x in ["RI01XP*", pulse_reply, "CI01XP*"]):
     responses = responses + xaxis.get_all_responses()
+    print(f"more pulse count responses: {responses}")
 
 # Print the responses
 print(f"------- Get pulse count command responses -------")
