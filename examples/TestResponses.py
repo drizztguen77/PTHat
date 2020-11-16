@@ -51,7 +51,10 @@ def get_responses(axis):
             response_index = resp_string.rfind(axis._command_end)
             if response_index >= 0:
                 # create list of responses
-                responses = resp_string[0:response_index].split(axis._command_end)
+                if responses is None:
+                    responses = []
+
+                responses.extend(resp_string[0:response_index].split(axis._command_end))
                 # add incomplete response for next check
                 resp_string = resp_string[response_index:]
                 print(f"Incomplete bytes: {resp_string}")
