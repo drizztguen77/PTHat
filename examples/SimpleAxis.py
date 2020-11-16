@@ -68,11 +68,8 @@ xaxis.send_command(xaxis.get_current_pulse_count())
 # The response should come back with 3 replies
 pulse_reply = f"XP{xaxis.direction}{xaxis.pulse_count:010}*"
 responses = xaxis.get_all_responses()
-print(f"pulse count responses: {responses}")
-print(f"looking for pulse reply: {pulse_reply}")
 while not all(x in responses for x in ["RI01XP*", pulse_reply, "CI01XP*"]):
     responses = responses + xaxis.get_all_responses()
-    print(f"more pulse count responses: {responses}")
 
 # Print the responses
 print(f"------- Get pulse count command responses -------")
