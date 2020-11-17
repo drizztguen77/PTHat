@@ -3,7 +3,6 @@ This is an example of setting up an Axis (motor) and starting it, revving it up 
 run for some time and then shutting it down.
 
 This example does not auto send the commands. It gets the command and then sends it to the send_command method.
-
 """
 from pthat.pthat import Axis
 
@@ -13,7 +12,7 @@ def show_responses(axis):
 
     # Parse the responses
     if responses is not None:
-        xaxis.parse_responses(responses)
+        axis.parse_responses(responses)
     else:
         print("No responses received")
 

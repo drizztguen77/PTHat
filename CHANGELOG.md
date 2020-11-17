@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Added
+- MultipleMotors example
 
+### Fixed
+- A bug in the other examples in the show_responses() method
+- 
 
 ##  [0.9.9]
 ### Removed
