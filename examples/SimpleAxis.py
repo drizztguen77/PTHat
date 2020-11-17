@@ -28,13 +28,13 @@ if direct.upper() == "F":
 else:
     direction = 1
 
-xaxis = Axis("X", serial_device="/dev/ttyS0")
+xaxis = Axis("X", command_id=1, serial_device="/dev/ttyS0")
 xaxis.debug = True
 
 # Setup the axis with values to start the motor
 frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
 pulse_count = xaxis.calculate_pulse_count(steps_per_rev, total_revolutions)
-set_axis_cmd = xaxis.set_axis(command_id=1, frequency=frequency, pulse_count=pulse_count, direction=direction,
+set_axis_cmd = xaxis.set_axis(frequency=frequency, pulse_count=pulse_count, direction=direction,
                               start_ramp=1, finish_ramp=1, ramp_divide=100, ramp_pause=10, enable_line_polarity=1)
 xaxis.send_command(set_axis_cmd)
 

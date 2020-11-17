@@ -30,7 +30,7 @@ class PTHat:
     This is the main Pulse Train Hat class. It is used to run commands against the PTHat and to run general commands.
     """
     # Properties
-    _version = "0.9.8"  # Version of this API
+    _version = "0.9.9"  # Version of this API
     command_type = "I"  # I = Instant or B = Buffer
     command_id = 00     # Optional command ID
     debug = False       # Sets debug mode. This just prints additional information
@@ -62,16 +62,20 @@ class PTHat:
     __start_buffer_command = "Z"       # Start the buffer command
     __buffer_loop_start_command = "W"  # Buffer loop start command
 
-    def __init__(self, test_mode=False, serial_device="/dev/ttyS0", baud_rate=115200):
+    def __init__(self, command_type="I", command_id=0, serial_device="/dev/ttyS0", baud_rate=115200, test_mode=False):
         """
         Constructor
 
-        :param test_mode: if true then serial commands will not actually be sent - default False
+        :param command_type: type of command, I = instant, B = buffered - default I
+        :param command_id: optional command ID, 0-99 - default 0
         :param serial_device: serial device - default /dev/ttyS0
         :param baud_rate: serial port baud rate - default 115200
+        :param test_mode: if true then serial commands will not actually be sent - default False
         """
         super().__init__()
 
+        self.command_type = command_type
+        self.command_id = command_id
         self.serial_device = serial_device  # default to /dev/ttyS0
         self.baud_rate = baud_rate  # default baud rate
         self.test_mode = test_mode
@@ -207,13 +211,11 @@ class PTHat:
 
         # TODO finish this parsing
 
-    def get_io_port_status(self, command_type="I", command_id=0):
+    def get_io_port_status(self):
         """
         When this request is sent, it will return the state of the Emergency Stop input port and each of the
         Limit Switch input ports. This allows them to be used as general inputs when limits disabled.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -249,9 +251,6 @@ class PTHat:
         Bit2=Z Limit input
         Bit1=E Limit input
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -262,15 +261,13 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def set_wait_delay(self, command_type="I", command_id=0, period="W", delay=0):
+    def set_wait_delay(self, period="W", delay=0):
         """
         When this request is sent, it causes a wait delay between buffered commands.
         Typical use is when switching one of the AUX outputs and you want to wait a while for it to complete.
         Note this is a wait and will pause the firmware routines, so do not use if a pulse train channel is running.
         You can set the Wait period to be in Milliseconds or Microseconds.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param period: period of time for the delay, W = Milliseconds, M = Microseconds - default W
         :param delay: length of delay - default 0
         :return: the command to send to the serial port
@@ -301,9 +298,6 @@ class PTHat:
         ---------------------------------------------------------------------------------------------------------------
         R00WW*	        C00WW*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -325,12 +319,10 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def toggle_motor_enable_line(self, command_type="I", command_id=0):
+    def toggle_motor_enable_line(self):
         """
         Toggles the Motor Enable Line
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -356,9 +348,6 @@ class PTHat:
         ---------------------------------------------------------------------------------------------------------------
         R00HT*	                                C00HT*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -371,12 +360,10 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def received_command_replies_on(self, command_type="I", command_id=0):
+    def received_command_replies_on(self):
         """
         Turns on the Received Replies.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -405,9 +392,6 @@ class PTHat:
         ---------------------------------------------------------------------------------------------------------------
         RI00R1*	                    RI00R0*	                    CI00R1*	                    CI00R0*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -421,12 +405,10 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def received_command_replies_off(self, command_type="I", command_id=0):
+    def received_command_replies_off(self):
         """
         Turns off the Received Replies.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -455,9 +437,6 @@ class PTHat:
         ---------------------------------------------------------------------------------------------------------------
         RI00R1*	                    RI00R0*	                    CI00R1*	                    CI00R0*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -471,12 +450,10 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def completed_command_replies_on(self, command_type="I", command_id=0):
+    def completed_command_replies_on(self):
         """
         Turns on the Completed Replies.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -505,9 +482,6 @@ class PTHat:
         ---------------------------------------------------------------------------------------------------------------
         RI00G1*	                    RI00G0*	                    CI00G1*	                    CI00G0*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -521,12 +495,10 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def completed_command_replies_off(self, command_type="I", command_id=0):
+    def completed_command_replies_off(self):
         """
         Turns off the Completed Replies.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -555,9 +527,6 @@ class PTHat:
         ---------------------------------------------------------------------------------------------------------------
         RI00G1*	                    RI00G0*	                    CI00G1*	                    CI00G0*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -571,12 +540,10 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def get_firmware_version(self, command_type="I", command_id=0):
+    def get_firmware_version(self):
         """
         Requests the Firmware Version from the PTHAT
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -603,9 +570,6 @@ class PTHat:
         ---------------------------------------------------------------------------------------------------------------
         RI00FW**Version*	            CI00FW*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -942,29 +906,31 @@ class Axis(PTHat):
     __change_axis_speed_command = "Q"  # Change the axis speed on the fly command
     __enable_disable_limit_switches_command = "K"  # enable/disable limit switches command
 
-    def __init__(self, axis, test_mode=False, serial_device="/dev/ttyS0", baud_rate=115200):
+    def __init__(self, axis, command_type="I", command_id=0, serial_device="/dev/ttyS0", baud_rate=115200,
+                 test_mode=False):
         """
         Constructor
 
-        :param test_mode: if true then serial commands will not actually be sent - default False
+        :param command_type: type of command, I = instant, B = buffered - default I
+        :param command_id: optional command ID, 0-99 - default 0
         :param serial_device: serial device - default /dev/ttyS0
         :param baud_rate: serial port baud rate - default 115200
+        :param test_mode: if true then serial commands will not actually be sent - default False
         """
-        super().__init__(test_mode=test_mode, serial_device=serial_device, baud_rate=baud_rate)
+        super().__init__(command_type=command_type, command_id=command_id, serial_device=serial_device,
+                         baud_rate=baud_rate, test_mode=test_mode)
         if str(axis).upper() == "X" or str(axis).upper() == "Y" or str(axis).upper() == "Z" or \
                 str(axis).upper() == "E" or str(axis).upper() == "A":
             self.axis = str(axis).upper()
         else:
             self.axis = "X"     # Default to X if an invalid axis is passed
 
-    def set_axis(self, command_type="I", command_id=0, frequency=0.0, pulse_count=0, direction=0, start_ramp=0,
+    def set_axis(self, frequency=0.0, pulse_count=0, direction=0, start_ramp=0,
                  finish_ramp=0, ramp_divide=0, ramp_pause=0, link_to_adc=0, enable_line_polarity=0):
         """
         This Command sets the properties of each Axis, but does not start the pulse train on that Axis.
         A Start Command must be used after to activate.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param frequency: frequency of the pulse train, 000000.000-500000.000 - default 0.0
         :param pulse_count: required pulse count, 0-4294967295 - default 0
         :param direction: direction, 0 = forward (CW), 1 = reverse (CCW) - default 0 (forward - CW)
@@ -1026,8 +992,6 @@ class Axis(PTHat):
         --------------------------------------------------------------------------------------------------------------------------------
         RI00CX*	    RI00CY*	    RI00CZ*	    RI00CE*	    CI00CX*	    CI00CY*	    CI00CZ*	    CI00CE*
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.frequency = frequency
         self.pulse_count = pulse_count
         self.direction = direction
@@ -1087,109 +1051,91 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def set_direction_forward(self, command_type="I", command_id=0):
+    def set_direction_forward(self):
         """
         Sets the direction to forward
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
         if self.debug:
             print(f"set_direction_forward command")
-        return self.set_axis(command_type=command_type, command_id=command_id, direction=0)
+        return self.set_axis(direction=0)
 
-    def set_direction_reverse(self, command_type="I", command_id=0):
+    def set_direction_reverse(self):
         """
         Sets the direction to reverse
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
         if self.debug:
             print(f"set_direction_reverse command")
-        return self.set_axis(command_type=command_type, command_id=command_id, direction=1)
+        return self.set_axis(direction=1)
 
-    def enable_start_ramp(self, command_type="I", command_id=0):
+    def enable_start_ramp(self):
         """
         Enables the start ramp
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
         if self.debug:
             print(f"enable_start_ramp command")
-        return self.set_axis(command_type=command_type, command_id=command_id, start_ramp=1)
+        return self.set_axis(start_ramp=1)
 
-    def disable_start_ramp(self, command_type="I", command_id=0):
+    def disable_start_ramp(self):
         """
         Disables the start ramp
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
         if self.debug:
             print(f"disable_start_ramp command")
-        return self.set_axis(command_type=command_type, command_id=command_id, start_ramp=0)
+        return self.set_axis(start_ramp=0)
 
-    def enable_finish_ramp(self, command_type="I", command_id=0):
+    def enable_finish_ramp(self):
         """
         Enables the finish ramp
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
         if self.debug:
             print(f"enable_finish_ramp command")
-        return self.set_axis(command_type=command_type, command_id=command_id, finish_ramp=1)
+        return self.set_axis(finish_ramp=1)
 
-    def disable_finish_ramp(self, command_type="I", command_id=0):
+    def disable_finish_ramp(self):
         """
         Disables the finish ramp
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
         if self.debug:
             print(f"disable_finish_ramp command")
-        return self.set_axis(command_type=command_type, command_id=command_id, finish_ramp=0)
+        return self.set_axis(finish_ramp=0)
 
-    def enable_line_polarity_0_volts(self, command_type="I", command_id=0):
+    def enable_line_polarity_0_volts(self):
         """
         Enable the line polarity at 0 volts
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
         if self.debug:
             print(f"enable_line_polarity_0_volts command")
-        return self.set_axis(command_type=command_type, command_id=command_id, enable_line_polarity=0)
+        return self.set_axis(enable_line_polarity=0)
 
-    def enable_line_polarity_5_volts(self, command_type="I", command_id=0):
+    def enable_line_polarity_5_volts(self):
         """
         Enable the line polarity at 5 volts
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
         if self.debug:
             print(f"enable_line_polarity_5_volts command")
-        return self.set_axis(command_type=command_type, command_id=command_id, enable_line_polarity=1)
+        return self.set_axis(enable_line_polarity=1)
 
-    def set_auto_direction_change(self, command_type="I", command_id=0, pulse_count=0):
+    def set_auto_direction_change(self, pulse_count=0):
         """
         This Command sets the Auto Direction Change of each Axis, but does not start the pulse train on that Axis.
         A Start Command must be used after to activate.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param pulse_count: pulse count to change direction on the fly, 0-4294967295 - default 0
         :return: the command to send to the serial port
 
@@ -1222,8 +1168,6 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00BX*	    RI00BY*	    RI00BZ*	    RI00BE*	    CI00BX*	    CI00BY*	    CI00BZ*	    CI00BE*
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.pulse_count_change_direction = pulse_count
 
         if not self._validate_command():
@@ -1241,8 +1185,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def set_auto_count_pulse_out(self, command_type="I", command_id=0, pulse_count=0, xreplies=0, yreplies=0,
-                                 zreplies=0, ereplies=0):
+    def set_auto_count_pulse_out(self, pulse_count=0, xreplies=0, yreplies=0, zreplies=0, ereplies=0):
         """
         This Command sets which Axis and at what pulse count it should send back the current pulse count of each axis.
         It also sends back direction of travel.
@@ -1252,8 +1195,6 @@ class Axis(PTHat):
         Be aware that this command can cause a lot of data being sent back over the serial port and if you try to
         send other commands while it is sending data back, there could be a clash.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param pulse_count: pulse count at which all Axis pulse counts will be sent back, 0-4294967295 - default 0
         :param xreplies: enable/disable X axis pulse count replies, disable = 0, enable = 1 - default 0
         :param yreplies: enable/disable Y axis pulse count replies, disable = 0, enable = 1 - default 0
@@ -1313,8 +1254,6 @@ class Axis(PTHat):
         0000000000-     0000000000-     0000000000-     0000000000-
         4294967295	    4294967295	    4294967295	    4294967295
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.pulse_counts_sent_back = pulse_count
         self.enable_disable_x_pulse_count_replies = xreplies
         self.enable_disable_y_pulse_count_replies = yreplies
@@ -1354,12 +1293,10 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def start(self, command_type="I", command_id=0):
+    def start(self):
         """
         Start one of the pulse trains running.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -1394,15 +1331,13 @@ class Axis(PTHat):
         """
         command = f"{self.command_type}{self.command_id:02}{self.__start_axis_command}{self.axis}" \
                   f"{self._command_end}"
-        self.__start(command=command, command_type=command_type, command_id=command_id)
+        self.__start(command=command)
         return command
 
-    def start_all(self, command_type="I", command_id=0):
+    def start_all(self):
         """
         Start all of the pulse trains running.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -1437,15 +1372,14 @@ class Axis(PTHat):
         """
         command = f"{self.command_type}{self.command_id:02}{self.__start_all_axis_command}" \
                   f"{self._command_end}"
-        self.__start(command=command, command_type=command_type, command_id=command_id)
+        self.__start(command=command)
         return command
 
-    def __start(self, command, command_type="I", command_id=0):
+    def __start(self, command):
         """
         Start one of the pulse trains running or start all.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
+        :param command: command to run to start
         :return: the command to send to the serial port
 
         Command:
@@ -1478,9 +1412,6 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00SX*	    RI00SY*	    RI00SZ*	    RI00SE*	    RI00SA*	    CI00SX*	    CI00SY*	    CI00SZ*	    CI00SE*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -1492,14 +1423,12 @@ class Axis(PTHat):
 
             self.__started = True
 
-    def stop(self, command_type="I", command_id=0):
+    def stop(self):
         """
         Stop one of the pulse trains from running. This is a controlled stop, in that the Axis will ramp down
         and not just stop to protect the motors. If you want to use a sudden stop then we recommend a external
         Emergency Stop button that cuts the power or send a Reset command.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -1533,17 +1462,15 @@ class Axis(PTHat):
         RI00TX*	    RI00TY*	    RI00TZ*	    RI00TE*	    RI00TA*	    CI00SX*	    CI00SY*	    CI00SZ*	    CI00SE*
         """
         command = f"{self.command_type}{self.command_id:02}{self.__stop_axis_command}{self.axis}{self._command_end}"
-        self.__stop(command=command, command_type=command_type, command_id=command_id)
+        self.__stop(command=command)
         return command
 
-    def stop_all(self, command_type="I", command_id=0):
+    def stop_all(self):
         """
         Stop all of the pulse trains from running. This is a controlled stop, in that the Axis will ramp down
         and not just stop to protect the motors. If you want to use a sudden stop then we recommend a external
         Emergency Stop button that cuts the power or send a Reset command.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -1578,17 +1505,16 @@ class Axis(PTHat):
         """
         command = f"{self.command_type}{self.command_id:02}{self.__stop_all_axis_command}" \
                   f"{self._command_end}"
-        self.__stop(command=command, command_type=command_type, command_id=command_id)
+        self.__stop(command=command)
         return command
 
-    def __stop(self, command, command_type="I", command_id=0):
+    def __stop(self, command):
         """
         Stop one or all of the pulse trains from running. This is a controlled stop, in that the Axis will ramp down
         and not just stop to protect the motors. If you want to use a sudden stop then we recommend a external
         Emergency Stop button that cuts the power or send a Reset command.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
+        :param command stop command
         :return: the command to send to the serial port
 
         Command:
@@ -1621,9 +1547,6 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00TX*	    RI00TY*	    RI00TZ*	    RI00TE*	    RI00TA*	    CI00SX*	    CI00SY*	    CI00SZ*	    CI00SE*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -1635,14 +1558,11 @@ class Axis(PTHat):
 
             self.__started = False
 
-    def pause(self, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
-              return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def pause(self, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Pauses one of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
         :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
         :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
@@ -1711,19 +1631,15 @@ class Axis(PTHat):
         command = f"{self.command_type}{self.command_id:02}{self.__pause_resume_axis_command}{self.axis}" \
                   f"{self.pause_all_return_x_pulse_count}{self.pause_all_return_y_pulse_count}" \
                   f"{self.pause_all_return_z_pulse_count}{self.pause_all_return_e_pulse_count}{self._command_end}"
-        self.__pause(command=command, command_type=command_type, command_id=command_id,
-                     return_x_pulse_cnt=return_x_pulse_cnt, return_y_pulse_cnt=return_y_pulse_cnt,
+        self.__pause(command=command, return_x_pulse_cnt=return_x_pulse_cnt, return_y_pulse_cnt=return_y_pulse_cnt,
                      return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def pause_all(self, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
-                  return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def pause_all(self, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Pauses all of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
         :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
         :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
@@ -1792,19 +1708,15 @@ class Axis(PTHat):
         command = f"{self.command_type}{self.command_id:02}{self.__pause_resume_all_axis_command}" \
                   f"{self.pause_all_return_x_pulse_count}{self.pause_all_return_y_pulse_count}" \
                   f"{self.pause_all_return_z_pulse_count}{self.pause_all_return_e_pulse_count}{self._command_end}"
-        self.__pause(command=command, command_type=command_type, command_id=command_id,
-                     return_x_pulse_cnt=return_x_pulse_cnt, return_y_pulse_cnt=return_y_pulse_cnt,
+        self.__pause(command=command, return_x_pulse_cnt=return_x_pulse_cnt, return_y_pulse_cnt=return_y_pulse_cnt,
                      return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def __pause(self, command, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
-                return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def __pause(self, command, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Pauses one or all of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
         :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
         :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
@@ -1870,8 +1782,6 @@ class Axis(PTHat):
         0000000000-     0000000000-     0000000000-     0000000000-     0000000000-
         4294967295      4294967295      4294967295      4294967295      4294967295
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.pause_all_return_x_pulse_count = return_x_pulse_cnt
         self.pause_all_return_y_pulse_count = return_y_pulse_cnt
         self.pause_all_return_z_pulse_count = return_z_pulse_cnt
@@ -1904,14 +1814,11 @@ class Axis(PTHat):
 
             self.__paused = True
 
-    def resume(self, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
-               return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def resume(self, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Resumes one of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
         :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
         :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
@@ -1966,19 +1873,15 @@ class Axis(PTHat):
         command = f"{self.command_type}{self.command_id:02}{self.__pause_resume_axis_command}{self.axis}" \
                   f"{self.pause_all_return_x_pulse_count}{self.pause_all_return_y_pulse_count}" \
                   f"{self.pause_all_return_z_pulse_count}{self.pause_all_return_e_pulse_count}{self._command_end}"
-        self.__resume(command=command, command_type=command_type, command_id=command_id,
-                      return_x_pulse_cnt=return_x_pulse_cnt, return_y_pulse_cnt=return_y_pulse_cnt,
+        self.__resume(command=command, return_x_pulse_cnt=return_x_pulse_cnt, return_y_pulse_cnt=return_y_pulse_cnt,
                       return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def resume_all(self, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
-                   return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def resume_all(self, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Resumes all of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
         :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
         :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
@@ -2033,19 +1936,15 @@ class Axis(PTHat):
         command = f"{self.command_type}{self.command_id:02}{self.__pause_resume_all_axis_command}" \
                   f"{self.pause_all_return_x_pulse_count}{self.pause_all_return_y_pulse_count}" \
                   f"{self.pause_all_return_z_pulse_count}{self.pause_all_return_e_pulse_count}{self._command_end}"
-        self.__resume(command=command, command_type=command_type, command_id=command_id,
-                      return_x_pulse_cnt=return_x_pulse_cnt, return_y_pulse_cnt=return_y_pulse_cnt,
+        self.__resume(command=command, return_x_pulse_cnt=return_x_pulse_cnt, return_y_pulse_cnt=return_y_pulse_cnt,
                       return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def __resume(self, command, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
-                 return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def __resume(self, command, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Resumes one or all of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
         :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
         :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
@@ -2097,8 +1996,6 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         CI00PX*	        CI00PY*	        CI00PZ*	        CI00PE*	        CI00PA*
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.pause_all_return_x_pulse_count = return_x_pulse_cnt
         self.pause_all_return_y_pulse_count = return_y_pulse_cnt
         self.pause_all_return_z_pulse_count = return_z_pulse_cnt
@@ -2131,12 +2028,10 @@ class Axis(PTHat):
 
             self.__paused = False
 
-    def get_current_pulse_count(self, command_type="I", command_id=0):
+    def get_current_pulse_count(self):
         """
         When this request is sent, it will return of the current pulse count of the running Axis.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -2178,9 +2073,6 @@ class Axis(PTHat):
         0000000000-         0000000000-         0000000000-         0000000000-
         4294967295          4294967295          4294967295          4294967295
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -2192,14 +2084,12 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def change_speed(self, frequency, command_type="I", command_id=0):
+    def change_speed(self, frequency):
         """
         This Command changes the speed of each Axis on the fly.
         A Set Axis Command and a Start Command must be used to set the Axis running before this command can be used.
 
         :param frequency: new frequency to change the speed to, 0.0-125000.0 - required
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -2232,8 +2122,6 @@ class Axis(PTHat):
         RI00QX*	    RI00QY*	    RI00QZ*	    RI00QE*	    CI00QX*	    CI00QY*	    CI00QZ*	    CI00QE*
         """
         self.frequency = frequency
-        self.command_type = command_type
-        self.command_id = command_id
 
         if not self._validate_command():
             return False
@@ -2250,13 +2138,11 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def enable_limit_switches(self, command_type="I", command_id=0):
+    def enable_limit_switches(self):
         """
         When this request is sent, it will Enable Limit Switch or Emergency Stop inputs. A reset on the PTHAT
         will set them to default of Disable
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -2290,9 +2176,6 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------------------
         R00KX*	    R00KY*	    R00KZ*	    R00KE*	    R00KS*	        C00KX*	    C00KY*	    C00KZ*	    C00KE*	    C00KS*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -2304,13 +2187,11 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def disable_limit_switches(self, command_type="I", command_id=0):
+    def disable_limit_switches(self):
         """
         When this request is sent, it will Disable Limit Switch or Emergency Stop inputs. A reset on the PTHAT
         will set them to default of Disable
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -2344,9 +2225,6 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------------------
         R00KX*	    R00KY*	    R00KZ*	    R00KE*	    R00KS*	        C00KX*	    C00KY*	    C00KZ*	    C00KE*	    C00KS*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -2358,13 +2236,11 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def enable_emergency_stop(self, command_type="I", command_id=0):
+    def enable_emergency_stop(self):
         """
         When this request is sent, it will Disable Limit Switch or Emergency Stop inputs. A reset on the PTHAT
         will set them to default of Disable
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -2398,9 +2274,6 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------------------
         R00KX*	    R00KY*	    R00KZ*	    R00KE*	    R00KS*	        C00KX*	    C00KY*	    C00KZ*	    C00KE*	    C00KS*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -2412,13 +2285,11 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def disable_emergency_stop(self, command_type="I", command_id=0):
+    def disable_emergency_stop(self):
         """
         When this request is sent, it will Disable Limit Switch or Emergency Stop inputs. A reset on the PTHAT
         will set them to default of Disable
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
 
         Command:
@@ -2452,9 +2323,6 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------------------
         R00KX*	    R00KY*	    R00KZ*	    R00KE*	    R00KS*	        C00KX*	    C00KY*	    C00KZ*	    C00KE*	    C00KS*
         """
-        self.command_type = command_type
-        self.command_id = command_id
-
         if not self._validate_command():
             return False
 
@@ -2517,16 +2385,20 @@ class ADC(PTHat):
     # ADC commands
     __request_adc_reading_command = "D"  # Request current ADC value - D1 = ADC1 Result, D2 = ADC2 Result
 
-    def __init__(self, adc_number, test_mode=False, serial_device="/dev/ttyS0", baud_rate=115200):
+    def __init__(self, adc_number, command_type="I", command_id=0, serial_device="/dev/ttyS0", baud_rate=115200,
+                 test_mode=False):
         """
         Constructor
 
         :param adc_number: ADC number, 1 or 2
-        :param test_mode: if true then serial commands will not actually be sent - default False
+        :param command_type: type of command, I = instant, B = buffered - default I
+        :param command_id: optional command ID, 0-99 - default 0
         :param serial_device: serial device - default /dev/ttyS0
         :param baud_rate: serial port baud rate - default 115200
+        :param test_mode: if true then serial commands will not actually be sent - default False
         """
-        super().__init__(test_mode=test_mode, serial_device=serial_device, baud_rate=baud_rate)
+        super().__init__(command_type=command_type, command_id=command_id, serial_device=serial_device,
+                         baud_rate=baud_rate, test_mode=test_mode)
         if self._validate_values(self.adc_number, 1, 2):
             if self.debug:
                 print(f"Valid ADC number {self.adc_number}.")
@@ -2534,12 +2406,10 @@ class ADC(PTHat):
         else:
             self.adc_number = 1     # Default to 1 if they pass an invalid number
 
-    def get_reading(self, command_type="I", command_id=0, adc_number=1):
+    def get_reading(self, adc_number=1):
         """
         When this request is sent, it will return the value of the ADC requested.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param adc_number ADC number, 1 or 2 - default 1
         :return: the command to send to the serial port
 
@@ -2569,8 +2439,6 @@ class ADC(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00D1**Result*	    RI00D2**Result*	    CI00D1*	        CI00D2*
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.adc_number = adc_number
 
         if not self._validate_command():
@@ -2608,16 +2476,20 @@ class AUX(PTHat):
     # AUX commands
     __set_on_off_aux_output_command = "A"  # Set on/off AUX output command - A1 = Set AUX1, A2 = Set AUX2, A3 = Set AUX3
 
-    def __init__(self, aux_number, test_mode=False, serial_device="/dev/ttyS0", baud_rate=115200):
+    def __init__(self, aux_number, command_type="I", command_id=0, serial_device="/dev/ttyS0", baud_rate=115200,
+                 test_mode=False):
         """
         Constructor
 
         :param aux_number: AUX number, 1-3
-        :param test_mode: if true then serial commands will not actually be sent - default False
+        :param command_type: type of command, I = instant, B = buffered - default I
+        :param command_id: optional command ID, 0-99 - default 0
         :param serial_device: serial device - default /dev/ttyS0
         :param baud_rate: serial port baud rate - default 115200
+        :param test_mode: if true then serial commands will not actually be sent - default False
         """
-        super().__init__(test_mode=test_mode, serial_device=serial_device, baud_rate=baud_rate)
+        super().__init__(command_type=command_type, command_id=command_id, serial_device=serial_device,
+                         baud_rate=baud_rate, test_mode=test_mode)
         if self._validate_values(self.aux_number, 1, 3):
             if self.debug:
                 print(f"Valid AUX number {self.aux_number}.")
@@ -2625,12 +2497,10 @@ class AUX(PTHat):
         else:
             self.aux_number = 1     # Default to 1 if they pass an invalid number
 
-    def output_on(self, command_type="I", command_id=0, aux_number=1):
+    def output_on(self, aux_number=1):
         """
         When this request is sent, it will switch on the Aux port.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param aux_number: AUX number, 1-3, default 1
         :return: the command to send to the serial port
 
@@ -2661,8 +2531,6 @@ class AUX(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         R00A1*	        R00A2*	        R00A3*	        C00A1*	        C00A2*	        C00A3*
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.aux_number = aux_number
 
         if not self._validate_command():
@@ -2679,12 +2547,10 @@ class AUX(PTHat):
             self.send_command(command=command)
         return command
 
-    def output_off(self, command_type="I", command_id=0, aux_number=1):
+    def output_off(self, aux_number=1):
         """
         When this request is sent, it will switch off the Aux port.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param aux_number: AUX number, 1-3, default 1
         :return: the command to send to the serial port
 
@@ -2715,8 +2581,6 @@ class AUX(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         R00A1*	        R00A2*	        R00A3*	        C00A1*	        C00A2*	        C00A3*
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.aux_number = aux_number
 
         if not self._validate_command():
@@ -2765,29 +2629,31 @@ class PWM(PTHat):
     __set_pwm_channel_command = "U"  # Sets the PWM channel - UX= Set X-Axis, UY= Set Y-Axis
     __set_both_pwm_channels_command = "UA"  # Sets both PWM channels in one command - UA= Set X-Axis and Y-Axis
 
-    def __init__(self, axis, test_mode=False, serial_device="/dev/ttyS0", baud_rate=115200):
+    def __init__(self, axis, command_type="I", command_id=0, serial_device="/dev/ttyS0", baud_rate=115200,
+                 test_mode=False):
         """
         Constructor
 
         :param axis: axis for this class
-        :param test_mode: if true then serial commands will not actually be sent - default False
+        :param command_type: type of command, I = instant, B = buffered - default I
+        :param command_id: optional command ID, 0-99 - default 0
         :param serial_device: serial device - default /dev/ttyS0
         :param baud_rate: serial port baud rate - default 115200
+        :param test_mode: if true then serial commands will not actually be sent - default False
         """
-        super().__init__(test_mode=test_mode, serial_device=serial_device, baud_rate=baud_rate)
+        super().__init__(command_type=command_type, command_id=command_id, serial_device=serial_device,
+                         baud_rate=baud_rate, test_mode=test_mode)
         if str(axis).upper() == "X" or str(axis).upper() == "Y" or str(axis).upper() == "A":
             self.axis = axis.upper()
         else:
             self.axis = "X"     # Default to X if they pass an invalid axis
 
-    def set_channel(self, command_type="I", command_id=0, frequency=0, duty_cycle=0):
+    def set_channel(self, frequency=0, duty_cycle=0):
         """
         ***Available Firmware V5.3 upwards***
         This Command sets the Frequency and Pulse Width for the desired channel.
         It then also starts it.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param frequency: frequency for the channel in 1Hz steps, 0000000-1000000 - default 0
         :param duty_cycle: duty cycle 0-100%. The last 2 digits are decimal places. So 08050 would be 80.5% - default 0
         :return: the command to send to the serial port
@@ -2821,8 +2687,6 @@ class PWM(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00UX*	    RI00UY*	    CI00UX*	    CI00UY*
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.frequency = frequency
         self.duty_cycle = duty_cycle
 
@@ -2851,39 +2715,30 @@ class PWM(PTHat):
             self.send_command(command=command)
         return command
 
-    def set_frequency(self, frequency, command_type="I", command_id=0):
+    def set_frequency(self, frequency):
         """
         Set the PWM frequency
 
         :param frequency: frequency for the channel in 1Hz steps, 0000000-1000000 - default 0
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
-        self.frequency = frequency
-        return self.set_channel(command_type=command_type, command_id=command_id)
+        return self.set_channel(frequency=frequency)
 
-    def set_duty_cycle(self, duty_cycle, command_type="I", command_id=0):
+    def set_duty_cycle(self, duty_cycle):
         """
         Set the PWM duty cycle
 
         :param duty_cycle: duty cycle 0-100%. The last 2 digits are decimal places. So 08050 would be 80.5% - default 0
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :return: the command to send to the serial port
         """
-        self.duty_cycle = duty_cycle
-        return self.set_channel(command_type=command_type, command_id=command_id)
+        return self.set_channel(duty_cycle=duty_cycle)
 
-    def set_both_channels(self, command_type="I", command_id=0, frequencyx=0, frequencyy=0, duty_cyclex=0,
-                          duty_cycley=0):
+    def set_both_channels(self, frequencyx=0, frequencyy=0, duty_cyclex=0, duty_cycley=0):
         """
         ***Available Firmware V5.3 upwards***
         This Command sets the Frequency and Pulse Width for both channels at the same time.
         It then also starts both together.
 
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
         :param frequencyx: frequency for the X channel in 1Hz steps, 0000000-1000000 - default 0
         :param frequencyy: frequency for the Y channel in 1Hz steps, 0000000-1000000 - default 0
         :param duty_cyclex: duty cycle for X channel 0-100%. The last 2 digits are decimal places. So 08050 would be
@@ -2923,8 +2778,6 @@ class PWM(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00UA*	                    CI00UA*
         """
-        self.command_type = command_type
-        self.command_id = command_id
         self.frequency_x = frequencyx
         self.frequency_y = frequencyy
         self.duty_cycle_x = duty_cyclex

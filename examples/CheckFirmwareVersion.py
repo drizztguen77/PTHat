@@ -18,11 +18,11 @@ def show_responses(axis):
         print("No responses received")
 
 
-xaxis = Axis("X", serial_device="/dev/ttyS0")
+xaxis = Axis("X", command_id=1, serial_device="/dev/ttyS0")
 xaxis.debug = True
 
 # Get the firmware version
-firmware_version_cmd = xaxis.get_firmware_version(command_id=1)
+firmware_version_cmd = xaxis.get_firmware_version()
 xaxis.send_command(firmware_version_cmd)
 
 # Show the responses
