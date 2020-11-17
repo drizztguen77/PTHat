@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+##  [0.9.8]
+### Changed
+- All command_id parameters were defaulted to a string so had to change it to an int
 
 ##  [0.9.7]
 ### Added
@@ -39,7 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new setup files and uploaded project to PyPI
 
 
-[Unreleased]: https://github.com/drizztguen77/pthat/compare/v0.9.7...HEAD
+[Unreleased]: https://github.com/drizztguen77/pthat/compare/v0.9.8...HEAD
+[0.9.8]: https://github.com/drizztguen77/pthat/compare/v0.9.7...v0.9.8
 [0.9.7]: https://github.com/drizztguen77/pthat/compare/v0.9.6...v0.9.7
 [0.9.6]: https://github.com/drizztguen77/pthat/compare/v0.9.5...v0.9.6
 [0.9.5]: https://github.com/drizztguen77/pthat/compare/v0.9.1...v0.9.5

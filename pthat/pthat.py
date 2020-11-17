@@ -30,7 +30,7 @@ class PTHat:
     This is the main Pulse Train Hat class. It is used to run commands against the PTHat and to run general commands.
     """
     # Properties
-    _version = "0.9.7"  # Version of this API
+    _version = "0.9.8"  # Version of this API
     command_type = "I"  # I = Instant or B = Buffer
     command_id = 00     # Optional command ID
     debug = False       # Sets debug mode. This just prints additional information
@@ -207,7 +207,7 @@ class PTHat:
 
         # TODO finish this parsing
 
-    def get_io_port_status(self, command_type="I", command_id="00"):
+    def get_io_port_status(self, command_type="I", command_id=0):
         """
         When this request is sent, it will return the state of the Emergency Stop input port and each of the
         Limit Switch input ports. This allows them to be used as general inputs when limits disabled.
@@ -262,7 +262,7 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def set_wait_delay(self, command_type="I", command_id="00", period="W", delay=0):
+    def set_wait_delay(self, command_type="I", command_id=0, period="W", delay=0):
         """
         When this request is sent, it causes a wait delay between buffered commands.
         Typical use is when switching one of the AUX outputs and you want to wait a while for it to complete.
@@ -325,7 +325,7 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def toggle_motor_enable_line(self, command_type="I", command_id="00"):
+    def toggle_motor_enable_line(self, command_type="I", command_id=0):
         """
         Toggles the Motor Enable Line
 
@@ -371,7 +371,7 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def received_command_replies_on(self, command_type="I", command_id="00"):
+    def received_command_replies_on(self, command_type="I", command_id=0):
         """
         Turns on the Received Replies.
 
@@ -421,7 +421,7 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def received_command_replies_off(self, command_type="I", command_id="00"):
+    def received_command_replies_off(self, command_type="I", command_id=0):
         """
         Turns off the Received Replies.
 
@@ -471,7 +471,7 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def completed_command_replies_on(self, command_type="I", command_id="00"):
+    def completed_command_replies_on(self, command_type="I", command_id=0):
         """
         Turns on the Completed Replies.
 
@@ -521,7 +521,7 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def completed_command_replies_off(self, command_type="I", command_id="00"):
+    def completed_command_replies_off(self, command_type="I", command_id=0):
         """
         Turns off the Completed Replies.
 
@@ -571,7 +571,7 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def get_firmware_version(self, command_type="I", command_id="00"):
+    def get_firmware_version(self, command_type="I", command_id=0):
         """
         Requests the Firmware Version from the PTHAT
 
@@ -957,7 +957,7 @@ class Axis(PTHat):
         else:
             self.axis = "X"     # Default to X if an invalid axis is passed
 
-    def set_axis(self, command_type="I", command_id="00", frequency=0.0, pulse_count=0, direction=0, start_ramp=0,
+    def set_axis(self, command_type="I", command_id=0, frequency=0.0, pulse_count=0, direction=0, start_ramp=0,
                  finish_ramp=0, ramp_divide=0, ramp_pause=0, link_to_adc=0, enable_line_polarity=0):
         """
         This Command sets the properties of each Axis, but does not start the pulse train on that Axis.
@@ -1087,7 +1087,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def set_direction_forward(self, command_type="I", command_id="00"):
+    def set_direction_forward(self, command_type="I", command_id=0):
         """
         Sets the direction to forward
 
@@ -1099,7 +1099,7 @@ class Axis(PTHat):
             print(f"set_direction_forward command")
         return self.set_axis(command_type=command_type, command_id=command_id, direction=0)
 
-    def set_direction_reverse(self, command_type="I", command_id="00"):
+    def set_direction_reverse(self, command_type="I", command_id=0):
         """
         Sets the direction to reverse
 
@@ -1111,7 +1111,7 @@ class Axis(PTHat):
             print(f"set_direction_reverse command")
         return self.set_axis(command_type=command_type, command_id=command_id, direction=1)
 
-    def enable_start_ramp(self, command_type="I", command_id="00"):
+    def enable_start_ramp(self, command_type="I", command_id=0):
         """
         Enables the start ramp
 
@@ -1123,7 +1123,7 @@ class Axis(PTHat):
             print(f"enable_start_ramp command")
         return self.set_axis(command_type=command_type, command_id=command_id, start_ramp=1)
 
-    def disable_start_ramp(self, command_type="I", command_id="00"):
+    def disable_start_ramp(self, command_type="I", command_id=0):
         """
         Disables the start ramp
 
@@ -1135,7 +1135,7 @@ class Axis(PTHat):
             print(f"disable_start_ramp command")
         return self.set_axis(command_type=command_type, command_id=command_id, start_ramp=0)
 
-    def enable_finish_ramp(self, command_type="I", command_id="00"):
+    def enable_finish_ramp(self, command_type="I", command_id=0):
         """
         Enables the finish ramp
 
@@ -1147,7 +1147,7 @@ class Axis(PTHat):
             print(f"enable_finish_ramp command")
         return self.set_axis(command_type=command_type, command_id=command_id, finish_ramp=1)
 
-    def disable_finish_ramp(self, command_type="I", command_id="00"):
+    def disable_finish_ramp(self, command_type="I", command_id=0):
         """
         Disables the finish ramp
 
@@ -1159,7 +1159,7 @@ class Axis(PTHat):
             print(f"disable_finish_ramp command")
         return self.set_axis(command_type=command_type, command_id=command_id, finish_ramp=0)
 
-    def enable_line_polarity_0_volts(self, command_type="I", command_id="00"):
+    def enable_line_polarity_0_volts(self, command_type="I", command_id=0):
         """
         Enable the line polarity at 0 volts
 
@@ -1171,7 +1171,7 @@ class Axis(PTHat):
             print(f"enable_line_polarity_0_volts command")
         return self.set_axis(command_type=command_type, command_id=command_id, enable_line_polarity=0)
 
-    def enable_line_polarity_5_volts(self, command_type="I", command_id="00"):
+    def enable_line_polarity_5_volts(self, command_type="I", command_id=0):
         """
         Enable the line polarity at 5 volts
 
@@ -1183,7 +1183,7 @@ class Axis(PTHat):
             print(f"enable_line_polarity_5_volts command")
         return self.set_axis(command_type=command_type, command_id=command_id, enable_line_polarity=1)
 
-    def set_auto_direction_change(self, command_type="I", command_id="00", pulse_count=0):
+    def set_auto_direction_change(self, command_type="I", command_id=0, pulse_count=0):
         """
         This Command sets the Auto Direction Change of each Axis, but does not start the pulse train on that Axis.
         A Start Command must be used after to activate.
@@ -1241,7 +1241,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def set_auto_count_pulse_out(self, command_type="I", command_id="00", pulse_count=0, xreplies=0, yreplies=0,
+    def set_auto_count_pulse_out(self, command_type="I", command_id=0, pulse_count=0, xreplies=0, yreplies=0,
                                  zreplies=0, ereplies=0):
         """
         This Command sets which Axis and at what pulse count it should send back the current pulse count of each axis.
@@ -1354,7 +1354,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def start(self, command_type="I", command_id="00"):
+    def start(self, command_type="I", command_id=0):
         """
         Start one of the pulse trains running.
 
@@ -1397,7 +1397,7 @@ class Axis(PTHat):
         self.__start(command=command, command_type=command_type, command_id=command_id)
         return command
 
-    def start_all(self, command_type="I", command_id="00"):
+    def start_all(self, command_type="I", command_id=0):
         """
         Start all of the pulse trains running.
 
@@ -1440,7 +1440,7 @@ class Axis(PTHat):
         self.__start(command=command, command_type=command_type, command_id=command_id)
         return command
 
-    def __start(self, command, command_type="I", command_id="00"):
+    def __start(self, command, command_type="I", command_id=0):
         """
         Start one of the pulse trains running or start all.
 
@@ -1492,7 +1492,7 @@ class Axis(PTHat):
 
             self.__started = True
 
-    def stop(self, command_type="I", command_id="00"):
+    def stop(self, command_type="I", command_id=0):
         """
         Stop one of the pulse trains from running. This is a controlled stop, in that the Axis will ramp down
         and not just stop to protect the motors. If you want to use a sudden stop then we recommend a external
@@ -1536,7 +1536,7 @@ class Axis(PTHat):
         self.__stop(command=command, command_type=command_type, command_id=command_id)
         return command
 
-    def stop_all(self, command_type="I", command_id="00"):
+    def stop_all(self, command_type="I", command_id=0):
         """
         Stop all of the pulse trains from running. This is a controlled stop, in that the Axis will ramp down
         and not just stop to protect the motors. If you want to use a sudden stop then we recommend a external
@@ -1581,7 +1581,7 @@ class Axis(PTHat):
         self.__stop(command=command, command_type=command_type, command_id=command_id)
         return command
 
-    def __stop(self, command, command_type="I", command_id="00"):
+    def __stop(self, command, command_type="I", command_id=0):
         """
         Stop one or all of the pulse trains from running. This is a controlled stop, in that the Axis will ramp down
         and not just stop to protect the motors. If you want to use a sudden stop then we recommend a external
@@ -1635,7 +1635,7 @@ class Axis(PTHat):
 
             self.__started = False
 
-    def pause(self, command_type="I", command_id="00", return_x_pulse_cnt=0, return_y_pulse_cnt=0,
+    def pause(self, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
               return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Pauses one of the pulse trains from running.
@@ -1716,7 +1716,7 @@ class Axis(PTHat):
                      return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def pause_all(self, command_type="I", command_id="00", return_x_pulse_cnt=0, return_y_pulse_cnt=0,
+    def pause_all(self, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
                   return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Pauses all of the pulse trains from running.
@@ -1797,7 +1797,7 @@ class Axis(PTHat):
                      return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def __pause(self, command, command_type="I", command_id="00", return_x_pulse_cnt=0, return_y_pulse_cnt=0,
+    def __pause(self, command, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
                 return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Pauses one or all of the pulse trains from running.
@@ -1904,7 +1904,7 @@ class Axis(PTHat):
 
             self.__paused = True
 
-    def resume(self, command_type="I", command_id="00", return_x_pulse_cnt=0, return_y_pulse_cnt=0,
+    def resume(self, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
                return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Resumes one of the pulse trains from running.
@@ -1971,7 +1971,7 @@ class Axis(PTHat):
                       return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def resume_all(self, command_type="I", command_id="00", return_x_pulse_cnt=0, return_y_pulse_cnt=0,
+    def resume_all(self, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
                    return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Resumes all of the pulse trains from running.
@@ -2038,7 +2038,7 @@ class Axis(PTHat):
                       return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def __resume(self, command, command_type="I", command_id="00", return_x_pulse_cnt=0, return_y_pulse_cnt=0,
+    def __resume(self, command, command_type="I", command_id=0, return_x_pulse_cnt=0, return_y_pulse_cnt=0,
                  return_z_pulse_cnt=0, return_e_pulse_cnt=0):
         """
         Resumes one or all of the pulse trains from running.
@@ -2131,7 +2131,7 @@ class Axis(PTHat):
 
             self.__paused = False
 
-    def get_current_pulse_count(self, command_type="I", command_id="00"):
+    def get_current_pulse_count(self, command_type="I", command_id=0):
         """
         When this request is sent, it will return of the current pulse count of the running Axis.
 
@@ -2192,7 +2192,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def change_speed(self, frequency, command_type="I", command_id="00"):
+    def change_speed(self, frequency, command_type="I", command_id=0):
         """
         This Command changes the speed of each Axis on the fly.
         A Set Axis Command and a Start Command must be used to set the Axis running before this command can be used.
@@ -2250,7 +2250,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def enable_limit_switches(self, command_type="I", command_id="00"):
+    def enable_limit_switches(self, command_type="I", command_id=0):
         """
         When this request is sent, it will Enable Limit Switch or Emergency Stop inputs. A reset on the PTHAT
         will set them to default of Disable
@@ -2304,7 +2304,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def disable_limit_switches(self, command_type="I", command_id="00"):
+    def disable_limit_switches(self, command_type="I", command_id=0):
         """
         When this request is sent, it will Disable Limit Switch or Emergency Stop inputs. A reset on the PTHAT
         will set them to default of Disable
@@ -2358,7 +2358,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def enable_emergency_stop(self, command_type="I", command_id="00"):
+    def enable_emergency_stop(self, command_type="I", command_id=0):
         """
         When this request is sent, it will Disable Limit Switch or Emergency Stop inputs. A reset on the PTHAT
         will set them to default of Disable
@@ -2412,7 +2412,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def disable_emergency_stop(self, command_type="I", command_id="00"):
+    def disable_emergency_stop(self, command_type="I", command_id=0):
         """
         When this request is sent, it will Disable Limit Switch or Emergency Stop inputs. A reset on the PTHAT
         will set them to default of Disable
@@ -2534,7 +2534,7 @@ class ADC(PTHat):
         else:
             self.adc_number = 1     # Default to 1 if they pass an invalid number
 
-    def get_reading(self, command_type="I", command_id="00", adc_number=1):
+    def get_reading(self, command_type="I", command_id=0, adc_number=1):
         """
         When this request is sent, it will return the value of the ADC requested.
 
@@ -2625,7 +2625,7 @@ class AUX(PTHat):
         else:
             self.aux_number = 1     # Default to 1 if they pass an invalid number
 
-    def output_on(self, command_type="I", command_id="00", aux_number=1):
+    def output_on(self, command_type="I", command_id=0, aux_number=1):
         """
         When this request is sent, it will switch on the Aux port.
 
@@ -2679,7 +2679,7 @@ class AUX(PTHat):
             self.send_command(command=command)
         return command
 
-    def output_off(self, command_type="I", command_id="00", aux_number=1):
+    def output_off(self, command_type="I", command_id=0, aux_number=1):
         """
         When this request is sent, it will switch off the Aux port.
 
@@ -2780,7 +2780,7 @@ class PWM(PTHat):
         else:
             self.axis = "X"     # Default to X if they pass an invalid axis
 
-    def set_channel(self, command_type="I", command_id="00", frequency=0, duty_cycle=0):
+    def set_channel(self, command_type="I", command_id=0, frequency=0, duty_cycle=0):
         """
         ***Available Firmware V5.3 upwards***
         This Command sets the Frequency and Pulse Width for the desired channel.
@@ -2851,7 +2851,7 @@ class PWM(PTHat):
             self.send_command(command=command)
         return command
 
-    def set_frequency(self, frequency, command_type="I", command_id="00"):
+    def set_frequency(self, frequency, command_type="I", command_id=0):
         """
         Set the PWM frequency
 
@@ -2863,7 +2863,7 @@ class PWM(PTHat):
         self.frequency = frequency
         return self.set_channel(command_type=command_type, command_id=command_id)
 
-    def set_duty_cycle(self, duty_cycle, command_type="I", command_id="00"):
+    def set_duty_cycle(self, duty_cycle, command_type="I", command_id=0):
         """
         Set the PWM duty cycle
 
@@ -2875,7 +2875,7 @@ class PWM(PTHat):
         self.duty_cycle = duty_cycle
         return self.set_channel(command_type=command_type, command_id=command_id)
 
-    def set_both_channels(self, command_type="I", command_id="00", frequencyx=0, frequencyy=0, duty_cyclex=0,
+    def set_both_channels(self, command_type="I", command_id=0, frequencyx=0, frequencyy=0, duty_cyclex=0,
                           duty_cycley=0):
         """
         ***Available Firmware V5.3 upwards***
