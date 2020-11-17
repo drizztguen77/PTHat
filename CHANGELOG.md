@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+##  [0.9.7]
+### Added
+- Parameters to methods that needed them
+
+### Changed
+- Updated API documentation
+
 ##  [0.9.6]
 ### Removed
 - Print statement from the get_response() method
@@ -32,7 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new setup files and uploaded project to PyPI
 
 
-[Unreleased]: https://github.com/drizztguen77/pthat/compare/v0.9.6...HEAD
-[0.9.6]: https://github.com/drizztguen77/pthat/compare/v0.9.1...v0.9.5
+[Unreleased]: https://github.com/drizztguen77/pthat/compare/v0.9.7...HEAD
+[0.9.7]: https://github.com/drizztguen77/pthat/compare/v0.9.6...v0.9.7
+[0.9.6]: https://github.com/drizztguen77/pthat/compare/v0.9.5...v0.9.6
 [0.9.5]: https://github.com/drizztguen77/pthat/compare/v0.9.1...v0.9.5
 [0.9.1]: https://github.com/drizztguen77/pthat/compare/v0.0.0...v0.9.1

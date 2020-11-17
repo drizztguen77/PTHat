@@ -21,24 +21,21 @@ def show_responses(axis):
 steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
 total_revolutions = int(input("How many total revolutions [50]? ") or "50")
 rpm = int(input("How many RPMs [500]? ") or "500")
-direction = int(input("Direction (Forward = 0, Reverse = 1) [0]? ") or "0")
+direct = input("Direction (Forward = F, Reverse = R) [F]? ") or "F"
+direction = 0
+if direct.upper() == "F":
+    direction = 0
+else:
+    direction = 1
 
-xaxis = Axis("X")
-xaxis.command_id = 1
+xaxis = Axis("X", serial_device="/dev/ttyS0")
 xaxis.debug = True
-xaxis.serial_device = "/dev/ttyS0"
 
 # Setup the axis with values to start the motor
-xaxis.frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
-xaxis.pulse_count = xaxis.calculate_pulse_count(steps_per_rev, total_revolutions)
-xaxis.direction = direction
-xaxis.start_ramp = 1                # ramp up
-xaxis.finish_ramp = 1               # ramp down
-xaxis.ramp_divide = 100             # divide frequency by this for ramp increment
-xaxis.ramp_pause = 10               # pause between each ramp increment
-xaxis.enable_line_polarity = 1      # 5 volts
-
-set_axis_cmd = xaxis.set_axis()
+frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
+pulse_count = xaxis.calculate_pulse_count(steps_per_rev, total_revolutions)
+set_axis_cmd = xaxis.set_axis(command_id=1, frequency=frequency, pulse_count=pulse_count, direction=direction,
+                              start_ramp=1, finish_ramp=1, ramp_divide=100, ramp_pause=10, enable_line_polarity=1)
 xaxis.send_command(set_axis_cmd)
 
 # Get the responses - look for both responses to be returned before continuing
