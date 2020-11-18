@@ -7,7 +7,7 @@ class TestAdc(unittest.TestCase):
     def setUp(self):
         self.adc = ADC(1, test_mode=True)
         self.adc.command_type = "I"
-        self.adc.command_id = 00
+        self.adc.command_id = 0
         self.adc.wait_delay = 0
         self.adc.debug = True
 

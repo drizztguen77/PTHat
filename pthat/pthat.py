@@ -30,9 +30,9 @@ class PTHat:
     This is the main Pulse Train Hat class. It is used to run commands against the PTHat and to run general commands.
     """
     # Properties
-    _version = "0.9.9"  # Version of this API
+    _version = "0.9.10"  # Version of this API
     command_type = "I"  # I = Instant or B = Buffer
-    command_id = 00     # Optional command ID
+    command_id = 0      # Optional command ID
     debug = False       # Sets debug mode. This just prints additional information
     test_mode = False   # This lets all methods to be run without actually sending them to the serial port
     wait_delay = 0      # Wait delay between commands - 0-9999 -
@@ -261,7 +261,7 @@ class PTHat:
             self.send_command(command=command)
         return command
 
-    def set_wait_delay(self, period="W", delay=0):
+    def set_wait_delay(self, period="W", delay=None):
         """
         When this request is sent, it causes a wait delay between buffered commands.
         Typical use is when switching one of the AUX outputs and you want to wait a while for it to complete.
@@ -301,14 +301,15 @@ class PTHat:
         if not self._validate_command():
             return False
 
-        self.wait_delay = delay
+        if not period == "W" and not period == "M":
+            print(f"Invalid period {period}")
+            return False
+
+        if delay is not None:
+            self.wait_delay = delay
 
         if not self._validate_values(self.wait_delay, 0, 9999):
             print(f"Invalid wait delay {delay}")
-            return False
-
-        if not period == "W" and not period == "M":
-            print(f"Invalid period {period}")
             return False
 
         command = f"{self.command_type}{self.command_id:02}{self.__set_wait_delay_command}{period}" \
@@ -614,7 +615,7 @@ class PTHat:
 
         self.wait_delay = 0
         self.command_type = "I"
-        self.command_id = 00
+        self.command_id = 0
         self._motor_enabled = False
         self._received_command_replies_enabled = False
         self._completed_command_replies_enabled = False
@@ -868,8 +869,8 @@ class Axis(PTHat):
     """
     # Properties
     axis = "X"  # X, Y, Z or E or A (all)
-    frequency = 000000.000  # frequency of the pulse train - 000000.000 - 500000.000
-    pulse_count = 0000000000  # required pulse count - 0000000000 - 4294967295
+    frequency = 0.0  # frequency of the pulse train - 000000.000 - 500000.000
+    pulse_count = 0  # required pulse count - 0000000000 - 4294967295
     direction = 0  # direction - 0 = clockwise (cw - forward), 1 = counter clockwise (ccw - reverse)
     start_ramp = 0  # start ramp - 0 = No Ramp, 1 = Ramp
     finish_ramp = 0  # finish ramp - 0 = No Ramp, 1 = Ramp
@@ -877,18 +878,18 @@ class Axis(PTHat):
     ramp_pause = 0  # Ramp pause between each ramp increment. 0 - 255
     link_to_adc = 0  # Link to ADC - 0 = No ADC, 1 = Link to ADC1, 2= Link to ADC2
     enable_line_polarity = 0  # Enable line polarity - 0 = Enable Line 0 Volts, 1 = Enable Line 5 Volts
-    pulse_count_change_direction = 0000000000  # Sets the Pulse count to change direction on the
-    #                                              fly - 0000000000-4294967295
-    pulse_counts_sent_back = 0000000000  # Sets the Pulse count at which all Axis pulse counts will be sent
-    #                                        back - 0000000000-4294967295
-    enable_disable_x_pulse_count_replies = 0  # 0=Disable X Axis Pulse Replies, 1=Enable X Axis Pulse Reply
-    enable_disable_y_pulse_count_replies = 0  # 0=Disable Y Axis Pulse Replies, 1=Enable Y Axis Pulse Reply
-    enable_disable_z_pulse_count_replies = 0  # 0=Disable Z Axis Pulse Replies, 1=Enable Z Axis Pulse Reply
-    enable_disable_e_pulse_count_replies = 0  # 0=Disable E Axis Pulse Replies, 1=Enable E Axis Pulse Reply
-    pause_all_return_x_pulse_count = 0    # 0=Disable X Axis Pulse Count Replies, 1=Enable X Axis Pulse Count Reply
-    pause_all_return_y_pulse_count = 0    # 0=Disable Y Axis Pulse Count Replies, 1=Enable Y Axis Pulse Count Reply
-    pause_all_return_z_pulse_count = 0    # 0=Disable Z Axis Pulse Count Replies, 1=Enable Z Axis Pulse Count Reply
-    pause_all_return_e_pulse_count = 0    # 0=Disable E Axis Pulse Count Replies, 1=Enable E Axis Pulse Count Reply
+    pulse_count_change_direction = 0  # Sets the Pulse count to change direction on the
+    #                                   fly - 0000000000-4294967295
+    pulse_counts_sent_back = 0  # Sets the Pulse count at which all Axis pulse counts will be sent
+    #                             back - 0000000000-4294967295
+    enable_disable_x_pulse_count_replies = 1  # 0=Disable X Axis Pulse Replies, 1=Enable X Axis Pulse Reply
+    enable_disable_y_pulse_count_replies = 1  # 0=Disable Y Axis Pulse Replies, 1=Enable Y Axis Pulse Reply
+    enable_disable_z_pulse_count_replies = 1  # 0=Disable Z Axis Pulse Replies, 1=Enable Z Axis Pulse Reply
+    enable_disable_e_pulse_count_replies = 1  # 0=Disable E Axis Pulse Replies, 1=Enable E Axis Pulse Reply
+    pause_all_return_x_pulse_count = 0   # Pause 0=Disable X Axis Pulse Count Replies, 1=Enable X Axis Pulse Count Reply
+    pause_all_return_y_pulse_count = 0   # Pause 0=Disable Y Axis Pulse Count Replies, 1=Enable Y Axis Pulse Count Reply
+    pause_all_return_z_pulse_count = 0   # Pause 0=Disable Z Axis Pulse Count Replies, 1=Enable Z Axis Pulse Count Reply
+    pause_all_return_e_pulse_count = 0   # Pause 0=Disable E Axis Pulse Count Replies, 1=Enable E Axis Pulse Count Reply
     __paused = False
     __started = False
 
@@ -925,22 +926,23 @@ class Axis(PTHat):
         else:
             self.axis = "X"     # Default to X if an invalid axis is passed
 
-    def set_axis(self, frequency=0.0, pulse_count=0, direction=0, start_ramp=0,
-                 finish_ramp=0, ramp_divide=0, ramp_pause=0, link_to_adc=0, enable_line_polarity=0):
+    def set_axis(self, frequency=None, pulse_count=None, direction=None, start_ramp=None,
+                 finish_ramp=None, ramp_divide=None, ramp_pause=None, link_to_adc=None, enable_line_polarity=None):
         """
         This Command sets the properties of each Axis, but does not start the pulse train on that Axis.
         A Start Command must be used after to activate.
 
-        :param frequency: frequency of the pulse train, 000000.000-500000.000 - default 0.0
-        :param pulse_count: required pulse count, 0-4294967295 - default 0
-        :param direction: direction, 0 = forward (CW), 1 = reverse (CCW) - default 0 (forward - CW)
-        :param start_ramp: start ramp, no ramp = 0, ramp = 1 - default 0
-        :param finish_ramp: finish ramp, no ramp = 0, ramp = 1 - default 0
+        :param frequency: frequency of the pulse train, 0.0-500000.0 - default 0.0 or self.frequency
+        :param pulse_count: required pulse count, 0-4294967295 - default 0 or self.pulse_count
+        :param direction: direction, 0 = forward (CW), 1 = reverse (CCW) - default 0 (forward - CW) or self.direction
+        :param start_ramp: start ramp, no ramp = 0, ramp = 1 - default 0 or self.start_ramp
+        :param finish_ramp: finish ramp, no ramp = 0, ramp = 1 - default 0 or self.finish_ramp
         :param ramp_divide: ramp divide, 0-255, will divide the target frequency by this value for each ramp
-                    increment - default 0
-        :param ramp_pause: ramp pause between each ramp increment, 0-255 - default 0
-        :param link_to_adc: link to ADC, no ADC = 0, ADC1 = 1, ADC2 = 2 - default 0
-        :param enable_line_polarity: enable line polarity, enable line 0 volts = 0, enable line 5 volts = 1
+                    increment - default 0 or self.ramp_divide
+        :param ramp_pause: ramp pause between each ramp increment, 0-255 - default 0 or self.ramp_pause
+        :param link_to_adc: link to ADC, no ADC = 0, ADC1 = 1, ADC2 = 2 - default 0 or self.link_to_adc
+        :param enable_line_polarity: enable line polarity, enable line 0 volts = 0, enable line 5 volts = 1 - default 0
+                    or self.enable_line_polarity
         :return: the command to send to the serial port
 
         Command:
@@ -992,24 +994,41 @@ class Axis(PTHat):
         --------------------------------------------------------------------------------------------------------------------------------
         RI00CX*	    RI00CY*	    RI00CZ*	    RI00CE*	    CI00CX*	    CI00CY*	    CI00CZ*	    CI00CE*
         """
-        self.frequency = frequency
-        self.pulse_count = pulse_count
-        self.direction = direction
-        self.start_ramp = start_ramp
-        self.finish_ramp = finish_ramp
-        self.ramp_divide = ramp_divide
-        self.ramp_pause = ramp_pause
-        self.link_to_adc = link_to_adc
-        self.enable_line_polarity = enable_line_polarity
-
         if not self._validate_command():
             return False
 
-        if not self._validate_values(self.frequency, 000000.000, 500000.000):
+        if frequency is not None:
+            self.frequency = frequency
+
+        if pulse_count is not None:
+            self.pulse_count = pulse_count
+
+        if direction is not None:
+            self.direction = direction
+
+        if start_ramp is not None:
+            self.start_ramp = start_ramp
+
+        if finish_ramp is not None:
+            self.finish_ramp = finish_ramp
+
+        if ramp_divide is not None:
+            self.ramp_divide = ramp_divide
+
+        if ramp_pause is not None:
+            self.ramp_pause = ramp_pause
+
+        if link_to_adc is not None:
+            self.link_to_adc = link_to_adc
+
+        if enable_line_polarity is not None:
+            self.enable_line_polarity = enable_line_polarity
+
+        if not self._validate_values(self.frequency, 0.0, 500000.0):
             print(f"Invalid frequency {self.frequency}")
             return False
 
-        if not self._validate_values(self.pulse_count, 0000000000, 4294967295):
+        if not self._validate_values(self.pulse_count, 0, 4294967295):
             print(f"Invalid pulse count {self.pulse_count}")
             return False
 
@@ -1131,12 +1150,12 @@ class Axis(PTHat):
             print(f"enable_line_polarity_5_volts command")
         return self.set_axis(enable_line_polarity=1)
 
-    def set_auto_direction_change(self, pulse_count=0):
+    def set_auto_direction_change(self, pulse_count=None):
         """
         This Command sets the Auto Direction Change of each Axis, but does not start the pulse train on that Axis.
         A Start Command must be used after to activate.
 
-        :param pulse_count: pulse count to change direction on the fly, 0-4294967295 - default 0
+        :param pulse_count: pulse count to change direction on the fly, 0-4294967295 - default 0 or self.pulse_count
         :return: the command to send to the serial port
 
         Command:
@@ -1168,10 +1187,11 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00BX*	    RI00BY*	    RI00BZ*	    RI00BE*	    CI00BX*	    CI00BY*	    CI00BZ*	    CI00BE*
         """
-        self.pulse_count_change_direction = pulse_count
-
         if not self._validate_command():
             return False
+
+        if pulse_count is not None:
+            self.pulse_count_change_direction = pulse_count
 
         if not self._validate_values(self.pulse_count_change_direction, 0000000000, 4294967295):
             print(f"Invalid pulse count to change direction on {self.pulse_count_change_direction}")
@@ -1185,7 +1205,7 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def set_auto_count_pulse_out(self, pulse_count=0, xreplies=0, yreplies=0, zreplies=0, ereplies=0):
+    def set_auto_count_pulse_out(self, pulse_count=None, xreplies=None, yreplies=None, zreplies=None, ereplies=None):
         """
         This Command sets which Axis and at what pulse count it should send back the current pulse count of each axis.
         It also sends back direction of travel.
@@ -1195,11 +1215,16 @@ class Axis(PTHat):
         Be aware that this command can cause a lot of data being sent back over the serial port and if you try to
         send other commands while it is sending data back, there could be a clash.
 
-        :param pulse_count: pulse count at which all Axis pulse counts will be sent back, 0-4294967295 - default 0
-        :param xreplies: enable/disable X axis pulse count replies, disable = 0, enable = 1 - default 0
-        :param yreplies: enable/disable Y axis pulse count replies, disable = 0, enable = 1 - default 0
-        :param zreplies: enable/disable Z axis pulse count replies, disable = 0, enable = 1 - default 0
-        :param ereplies: enable/disable E axis pulse count replies, disable = 0, enable = 1 - default 0
+        :param pulse_count: pulse count at which all Axis pulse counts will be sent back, 0-4294967295 - default 0 or
+                            self.pulse_count
+        :param xreplies: enable/disable X axis pulse count replies, disable = 0, enable = 1 - default 1 or
+                         self.enable_disable_x_pulse_count_replies
+        :param yreplies: enable/disable Y axis pulse count replies, disable = 0, enable = 1 - default 1 or
+                         self.enable_disable_y_pulse_count_replies
+        :param zreplies: enable/disable Z axis pulse count replies, disable = 0, enable = 1 - default 1 or
+                         self.enable_disable_z_pulse_count_replies
+        :param ereplies: enable/disable E axis pulse count replies, disable = 0, enable = 1 - default 1 or
+                         self.enable_disable_e_pulse_count_replies
         :return: the command to send to the serial port
 
         Command:
@@ -1254,14 +1279,23 @@ class Axis(PTHat):
         0000000000-     0000000000-     0000000000-     0000000000-
         4294967295	    4294967295	    4294967295	    4294967295
         """
-        self.pulse_counts_sent_back = pulse_count
-        self.enable_disable_x_pulse_count_replies = xreplies
-        self.enable_disable_y_pulse_count_replies = yreplies
-        self.enable_disable_z_pulse_count_replies = zreplies
-        self.enable_disable_e_pulse_count_replies = ereplies
-
         if not self._validate_command():
             return False
+
+        if pulse_count is not None:
+            self.pulse_counts_sent_back = pulse_count
+
+        if xreplies is not None:
+            self.enable_disable_x_pulse_count_replies = xreplies
+
+        if yreplies is not None:
+            self.enable_disable_y_pulse_count_replies = yreplies
+
+        if zreplies is not None:
+            self.enable_disable_z_pulse_count_replies = zreplies
+
+        if ereplies is not None:
+            self.enable_disable_e_pulse_count_replies = ereplies
 
         if not self._validate_values(self.pulse_counts_sent_back, 0000000000, 4294967295):
             print(f"Invalid pulse count to send back on {self.pulse_counts_sent_back}")
@@ -1558,15 +1592,19 @@ class Axis(PTHat):
 
             self.__started = False
 
-    def pause(self, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def pause(self, return_x_pulse_cnt=None, return_y_pulse_cnt=None, return_z_pulse_cnt=None, return_e_pulse_cnt=None):
         """
         Pauses one of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
-        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
-        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
-        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1
+        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_x_pulse_count
+        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_y_pulse_count
+        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_z_pulse_count
+        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_e_pulse_count
         :return: the command to send to the serial port
 
         Command:
@@ -1635,15 +1673,20 @@ class Axis(PTHat):
                      return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def pause_all(self, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def pause_all(self, return_x_pulse_cnt=None, return_y_pulse_cnt=None, return_z_pulse_cnt=None,
+                  return_e_pulse_cnt=None):
         """
         Pauses all of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
-        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
-        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
-        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1
+        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_x_pulse_count
+        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_y_pulse_count
+        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_z_pulse_count
+        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_e_pulse_count
         :return: the command to send to the serial port
 
         Command:
@@ -1712,15 +1755,20 @@ class Axis(PTHat):
                      return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def __pause(self, command, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def __pause(self, command, return_x_pulse_cnt=None, return_y_pulse_cnt=None, return_z_pulse_cnt=None,
+                return_e_pulse_cnt=None):
         """
         Pauses one or all of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
-        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
-        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
-        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1
+        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_x_pulse_count
+        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_y_pulse_count
+        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_z_pulse_count
+        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_e_pulse_count
         :return: the command to send to the serial port
 
         Command:
@@ -1782,13 +1830,20 @@ class Axis(PTHat):
         0000000000-     0000000000-     0000000000-     0000000000-     0000000000-
         4294967295      4294967295      4294967295      4294967295      4294967295
         """
-        self.pause_all_return_x_pulse_count = return_x_pulse_cnt
-        self.pause_all_return_y_pulse_count = return_y_pulse_cnt
-        self.pause_all_return_z_pulse_count = return_z_pulse_cnt
-        self.pause_all_return_e_pulse_count = return_e_pulse_cnt
-
         if not self._validate_command():
             return False
+
+        if return_x_pulse_cnt is not None:
+            self.pause_all_return_x_pulse_count = return_x_pulse_cnt
+
+        if return_y_pulse_cnt is not None:
+            self.pause_all_return_y_pulse_count = return_y_pulse_cnt
+
+        if return_z_pulse_cnt is not None:
+            self.pause_all_return_z_pulse_count = return_z_pulse_cnt
+
+        if return_e_pulse_cnt is not None:
+            self.pause_all_return_e_pulse_count = return_e_pulse_cnt
 
         if not self._validate_values(self.pause_all_return_x_pulse_count, 0, 1):
             print(f"Invalid pause all return X pulse count {self.pause_all_return_x_pulse_count}")
@@ -1814,15 +1869,20 @@ class Axis(PTHat):
 
             self.__paused = True
 
-    def resume(self, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def resume(self, return_x_pulse_cnt=None, return_y_pulse_cnt=None, return_z_pulse_cnt=None,
+               return_e_pulse_cnt=None):
         """
         Resumes one of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
-        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
-        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
-        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1
+        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_x_pulse_count
+        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_y_pulse_count
+        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_z_pulse_count
+        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_e_pulse_count
         :return: the command to send to the serial port
 
         Command:
@@ -1877,15 +1937,20 @@ class Axis(PTHat):
                       return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def resume_all(self, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def resume_all(self, return_x_pulse_cnt=None, return_y_pulse_cnt=None, return_z_pulse_cnt=None,
+                   return_e_pulse_cnt=None):
         """
         Resumes all of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
-        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
-        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
-        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1
+        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_x_pulse_count
+        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_y_pulse_count
+        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_z_pulse_count
+        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_e_pulse_count
         :return: the command to send to the serial port
 
         Command:
@@ -1940,15 +2005,20 @@ class Axis(PTHat):
                       return_z_pulse_cnt=return_z_pulse_cnt, return_e_pulse_cnt=return_e_pulse_cnt)
         return command
 
-    def __resume(self, command, return_x_pulse_cnt=0, return_y_pulse_cnt=0, return_z_pulse_cnt=0, return_e_pulse_cnt=0):
+    def __resume(self, command, return_x_pulse_cnt=None, return_y_pulse_cnt=None, return_z_pulse_cnt=None,
+                 return_e_pulse_cnt=None):
         """
         Resumes one or all of the pulse trains from running.
         Bytes 6-9 choose to send Pulse count back after pause for each Axis.
 
-        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1
-        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1
-        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1
-        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1
+        :param return_x_pulse_cnt: X axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_x_pulse_count
+        :param return_y_pulse_cnt: Y axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_y_pulse_count
+        :param return_z_pulse_cnt: Z axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_z_pulse_count
+        :param return_e_pulse_cnt: E axis pulse count replies, disable = 0, enable = 1 - default 0 or
+                                   self.pause_all_return_e_pulse_count
         :return: the command to send to the serial port
 
         Command:
@@ -1996,13 +2066,20 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         CI00PX*	        CI00PY*	        CI00PZ*	        CI00PE*	        CI00PA*
         """
-        self.pause_all_return_x_pulse_count = return_x_pulse_cnt
-        self.pause_all_return_y_pulse_count = return_y_pulse_cnt
-        self.pause_all_return_z_pulse_count = return_z_pulse_cnt
-        self.pause_all_return_e_pulse_count = return_e_pulse_cnt
-
         if not self._validate_command():
             return False
+
+        if return_x_pulse_cnt is not None:
+            self.pause_all_return_x_pulse_count = return_x_pulse_cnt
+
+        if return_y_pulse_cnt is not None:
+            self.pause_all_return_y_pulse_count = return_y_pulse_cnt
+
+        if return_z_pulse_cnt is not None:
+            self.pause_all_return_z_pulse_count = return_z_pulse_cnt
+
+        if return_e_pulse_cnt is not None:
+            self.pause_all_return_e_pulse_count = return_e_pulse_cnt
 
         if not self._validate_values(self.pause_all_return_x_pulse_count, 0, 1):
             print(f"Invalid pause all return X pulse count {self.pause_all_return_x_pulse_count}")
@@ -2084,12 +2161,12 @@ class Axis(PTHat):
             self.send_command(command=command)
         return command
 
-    def change_speed(self, frequency):
+    def change_speed(self, new_frequency):
         """
         This Command changes the speed of each Axis on the fly.
         A Set Axis Command and a Start Command must be used to set the Axis running before this command can be used.
 
-        :param frequency: new frequency to change the speed to, 0.0-125000.0 - required
+        :param new_frequency: new frequency to change the speed to, 0.0-125000.0 - required
         :return: the command to send to the serial port
 
         Command:
@@ -2121,13 +2198,13 @@ class Axis(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00QX*	    RI00QY*	    RI00QZ*	    RI00QE*	    CI00QX*	    CI00QY*	    CI00QZ*	    CI00QE*
         """
-        self.frequency = frequency
+        self.frequency = new_frequency
 
         if not self._validate_command():
             return False
 
-        if not self._validate_values(frequency, 000000.000, 125000.000):
-            print(f"Invalid frequency {self.frequency}. Must be between 000000.000 and 125000.000")
+        if not self._validate_values(self.frequency, 0.0, 125000.0):
+            print(f"Invalid frequency {self.frequency}. Must be between 0.0 and 125000.0")
             return False
 
         command = f"{self.command_type}{self.command_id:02}{self.__change_axis_speed_command}{self.axis}" \
@@ -2339,8 +2416,8 @@ class Axis(PTHat):
         Call reset on the parent class and then reset all the variables
         """
         super().reset()
-        self.frequency = 000000.000
-        self.pulse_count = 0000000000
+        self.frequency = 0.0
+        self.pulse_count = 0
         self.direction = 0
         self.start_ramp = 0
         self.finish_ramp = 0
@@ -2348,12 +2425,12 @@ class Axis(PTHat):
         self.ramp_pause = 0
         self.link_to_adc = 0
         self.enable_line_polarity = 0
-        self.pulse_count_change_direction = 0000000000
-        self.pulse_counts_sent_back = 0000000000
-        self.enable_disable_x_pulse_count_replies = 0
-        self.enable_disable_y_pulse_count_replies = 0
-        self.enable_disable_z_pulse_count_replies = 0
-        self.enable_disable_e_pulse_count_replies = 0
+        self.pulse_count_change_direction = 0
+        self.pulse_counts_sent_back = 0
+        self.enable_disable_x_pulse_count_replies = 1
+        self.enable_disable_y_pulse_count_replies = 1
+        self.enable_disable_z_pulse_count_replies = 1
+        self.enable_disable_e_pulse_count_replies = 1
         self.pause_all_return_x_pulse_count = 0
         self.pause_all_return_y_pulse_count = 0
         self.pause_all_return_z_pulse_count = 0
@@ -2399,18 +2476,18 @@ class ADC(PTHat):
         """
         super().__init__(command_type=command_type, command_id=command_id, serial_device=serial_device,
                          baud_rate=baud_rate, test_mode=test_mode)
-        if self._validate_values(self.adc_number, 1, 2):
+        if self._validate_values(adc_number, 1, 2):
             if self.debug:
                 print(f"Valid ADC number {self.adc_number}.")
             self.adc_number = adc_number
         else:
             self.adc_number = 1     # Default to 1 if they pass an invalid number
 
-    def get_reading(self, adc_number=1):
+    def get_reading(self, adc_number=None):
         """
         When this request is sent, it will return the value of the ADC requested.
 
-        :param adc_number ADC number, 1 or 2 - default 1
+        :param adc_number ADC number, 1 or 2 - default 1 or self.adc_number
         :return: the command to send to the serial port
 
         Command:
@@ -2439,10 +2516,11 @@ class ADC(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00D1**Result*	    RI00D2**Result*	    CI00D1*	        CI00D2*
         """
-        self.adc_number = adc_number
-
         if not self._validate_command():
             return False
+
+        if adc_number is not None:
+            self.adc_number = adc_number
 
         if not self._validate_values(self.adc_number, 1, 2):
             print(f"Invalid ADC number {self.adc_number}. Should be 1 or 2")
@@ -2490,18 +2568,18 @@ class AUX(PTHat):
         """
         super().__init__(command_type=command_type, command_id=command_id, serial_device=serial_device,
                          baud_rate=baud_rate, test_mode=test_mode)
-        if self._validate_values(self.aux_number, 1, 3):
+        if self._validate_values(aux_number, 1, 3):
             if self.debug:
                 print(f"Valid AUX number {self.aux_number}.")
             self.aux_number = aux_number
         else:
             self.aux_number = 1     # Default to 1 if they pass an invalid number
 
-    def output_on(self, aux_number=1):
+    def output_on(self, aux_number=None):
         """
         When this request is sent, it will switch on the Aux port.
 
-        :param aux_number: AUX number, 1-3, default 1
+        :param aux_number: AUX number, 1-3, default 1 or self.aux_number
         :return: the command to send to the serial port
 
         Command:
@@ -2531,10 +2609,11 @@ class AUX(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         R00A1*	        R00A2*	        R00A3*	        C00A1*	        C00A2*	        C00A3*
         """
-        self.aux_number = aux_number
-
         if not self._validate_command():
             return False
+
+        if aux_number is not None:
+            self.aux_number = aux_number
 
         if not self._validate_values(self.aux_number, 1, 3):
             print(f"Invalid AUX number {self.aux_number}. Should be between 1 and 3")
@@ -2547,11 +2626,11 @@ class AUX(PTHat):
             self.send_command(command=command)
         return command
 
-    def output_off(self, aux_number=1):
+    def output_off(self, aux_number=None):
         """
         When this request is sent, it will switch off the Aux port.
 
-        :param aux_number: AUX number, 1-3, default 1
+        :param aux_number: AUX number, 1-3, default 1 or self.aux_number
         :return: the command to send to the serial port
 
         Command:
@@ -2581,10 +2660,11 @@ class AUX(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         R00A1*	        R00A2*	        R00A3*	        C00A1*	        C00A2*	        C00A3*
         """
-        self.aux_number = aux_number
-
         if not self._validate_command():
             return False
+
+        if aux_number is not None:
+            self.aux_number = aux_number
 
         if not self._validate_values(self.aux_number, 1, 3):
             print(f"Invalid AUX number {self.aux_number}. Should be between 1 and 3")
@@ -2616,14 +2696,14 @@ class PWM(PTHat):
     """
     # Properties
     axis = "X"  # Sets which Axis is to be set - X or Y, if UA then this doesn't matter as it will do both X and Y
-    frequency = 0000000  # Frequency for the channel is in 1Hz steps - 0000000-1000000
-    duty_cycle = 00000   # Sets the Duty Cycle 0-100%, The last 2 digits are decimal places. So 08050 would be 80.5%
+    frequency = 0  # Frequency for the channel is in 1Hz steps - 0000000-1000000
+    duty_cycle = 0   # Sets the Duty Cycle 0-100%, The last 2 digits are decimal places. So 08050 would be 80.5%
 
     # Used for Set Both PWM Channels Command only
-    frequency_x = 0000000  # Sets the Frequency for the channel in 1Hz steps for X-Axis
-    frequency_y = 0000000  # Sets the Frequency for the channel in 1Hz steps for Y-Axis
-    duty_cycle_x = 00000   # Sets the Duty Cycle 0-100% for X-Axis
-    duty_cycle_y = 00000   # Sets the Duty Cycle 0-100% for Y-Axis
+    frequency_x = 0  # Sets the Frequency for the channel in 1Hz steps for X-Axis
+    frequency_y = 0  # Sets the Frequency for the channel in 1Hz steps for Y-Axis
+    duty_cycle_x = 0   # Sets the Duty Cycle 0-100% for X-Axis
+    duty_cycle_y = 0   # Sets the Duty Cycle 0-100% for Y-Axis
 
     # PWM commands
     __set_pwm_channel_command = "U"  # Sets the PWM channel - UX= Set X-Axis, UY= Set Y-Axis
@@ -2648,14 +2728,15 @@ class PWM(PTHat):
         else:
             self.axis = "X"     # Default to X if they pass an invalid axis
 
-    def set_channel(self, frequency=0, duty_cycle=0):
+    def set_channel(self, frequency=None, duty_cycle=None):
         """
         ***Available Firmware V5.3 upwards***
         This Command sets the Frequency and Pulse Width for the desired channel.
         It then also starts it.
 
-        :param frequency: frequency for the channel in 1Hz steps, 0000000-1000000 - default 0
+        :param frequency: frequency for the channel in 1Hz steps, 0000000-1000000 - default 0 or self.frequency
         :param duty_cycle: duty cycle 0-100%. The last 2 digits are decimal places. So 08050 would be 80.5% - default 0
+                           or self.duty_cycle
         :return: the command to send to the serial port
 
         Command:
@@ -2687,9 +2768,6 @@ class PWM(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00UX*	    RI00UY*	    CI00UX*	    CI00UY*
         """
-        self.frequency = frequency
-        self.duty_cycle = duty_cycle
-
         if not self._validate_command():
             return False
 
@@ -2697,8 +2775,14 @@ class PWM(PTHat):
             print(f"Invalid axis {self.axis}. Should be X or Y")
             return False
 
-        if not self._validate_values(self.frequency, 0000000, 1000000):
-            print(f"Invalid frequency {self.frequency}. Should be between 0000000 and 1000000")
+        if frequency is not None:
+            self.frequency = frequency
+
+        if duty_cycle is not None:
+            self.duty_cycle = duty_cycle
+
+        if not self._validate_values(self.frequency, 0, 1000000):
+            print(f"Invalid frequency {self.frequency}. Should be between 0 and 1000000")
             return False
 
         if not self._validate_values(self.duty_cycle, 0, 100):
@@ -2733,18 +2817,18 @@ class PWM(PTHat):
         """
         return self.set_channel(duty_cycle=duty_cycle)
 
-    def set_both_channels(self, frequencyx=0, frequencyy=0, duty_cyclex=0, duty_cycley=0):
+    def set_both_channels(self, frequencyx=None, frequencyy=None, duty_cyclex=None, duty_cycley=None):
         """
         ***Available Firmware V5.3 upwards***
         This Command sets the Frequency and Pulse Width for both channels at the same time.
         It then also starts both together.
 
-        :param frequencyx: frequency for the X channel in 1Hz steps, 0000000-1000000 - default 0
-        :param frequencyy: frequency for the Y channel in 1Hz steps, 0000000-1000000 - default 0
+        :param frequencyx: frequency for the X channel in 1Hz steps, 0000000-1000000 - default 0 or self.frequency_x
+        :param frequencyy: frequency for the Y channel in 1Hz steps, 0000000-1000000 - default 0 or self.frequency_y
         :param duty_cyclex: duty cycle for X channel 0-100%. The last 2 digits are decimal places. So 08050 would be
-                    80.5% - default 0
+                    80.5% - default 0 or self.duty_cycle_x
         :param duty_cycley: duty cycle for Y channel 0-100%. The last 2 digits are decimal places. So 08050 would be
-                    80.5% - default 0
+                    80.5% - default 0 or self.duty_cycle_x
         :return: the command to send to the serial port
 
         Command:
@@ -2778,20 +2862,27 @@ class PWM(PTHat):
         ---------------------------------------------------------------------------------------------------------------
         RI00UA*	                    CI00UA*
         """
-        self.frequency_x = frequencyx
-        self.frequency_y = frequencyy
-        self.duty_cycle_x = duty_cyclex
-        self.duty_cycle_y = duty_cycley
-
         if not self._validate_command():
             return False
 
-        if not self._validate_values(self.frequency_x, 0000000, 1000000):
-            print(f"Invalid frequency X {self.frequency_x}. Should be between 0000000 and 1000000")
+        if frequencyx is not None:
+            self.frequency_x = frequencyx
+
+        if frequencyy is not None:
+            self.frequency_y = frequencyy
+
+        if duty_cyclex is not None:
+            self.duty_cycle_x = duty_cyclex
+
+        if duty_cycley is not None:
+            self.duty_cycle_y = duty_cycley
+
+        if not self._validate_values(self.frequency_x, 0, 1000000):
+            print(f"Invalid frequency X {self.frequency_x}. Should be between 0 and 1000000")
             return False
 
-        if not self._validate_values(self.frequency_y, 0000000, 1000000):
-            print(f"Invalid frequency Y {self.frequency_y}. Should be between 0000000 and 1000000")
+        if not self._validate_values(self.frequency_y, 0, 1000000):
+            print(f"Invalid frequency Y {self.frequency_y}. Should be between 0 and 1000000")
             return False
 
         if not self._validate_values(self.duty_cycle_x, 0, 100):
@@ -2820,9 +2911,9 @@ class PWM(PTHat):
         """
         super().reset()
 
-        self.frequency = 0000000
+        self.frequency = 0
         self.duty_cycle = 0
-        self.frequency_x = 0000000
-        self.frequency_y = 0000000
+        self.frequency_x = 0
+        self.frequency_y = 0
         self.duty_cycle_x = 0
         self.duty_cycle_y = 0

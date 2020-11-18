@@ -7,7 +7,7 @@ class TestPthat(unittest.TestCase):
     def setUp(self):
         self.pthat = PTHat(test_mode=True)
         self.pthat.command_type = "I"
-        self.pthat.command_id = 00
+        self.pthat.command_id = 0
         self.pthat.wait_delay = 0
         self.pthat.debug = True
 
@@ -55,6 +55,9 @@ class TestPthat(unittest.TestCase):
 
     def test_frequency_to_rpm(self):
         self.assertEqual(self.pthat.frequency_to_rpm(frequency=2667, steps_per_rev=200), 800)
+
+    def test_calculate_pulse_count(self):
+        self.assertEqual(self.pthat.calculate_pulse_count(steps_per_rev=200, total_revs=50), 10000)
 
 
 if __name__ == '__main__':

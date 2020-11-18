@@ -7,7 +7,7 @@ class TestAux(unittest.TestCase):
     def setUp(self):
         self.aux = AUX(1, test_mode=True)
         self.aux.command_type = "I"
-        self.aux.command_id = 00
+        self.aux.command_id = 0
         self.aux.wait_delay = 0
         self.aux.debug = True
 

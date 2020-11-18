@@ -5,12 +5,9 @@ from pthat.pthat import Axis
 class TestAxis(unittest.TestCase):
 
     def setUp(self):
-        self.axis = Axis("X", test_mode=True)
-        self.axis.command_type = "I"
-        self.axis.command_id = 00
-        self.axis.wait_delay = 0
+        self.axis = Axis("X", command_type="I", command_id=0, test_mode=True)
         self.axis.debug = True
-        self.axis.frequency = 125000.000
+        self.axis.frequency = 125000.0
         self.axis.pulse_count = 4294967295
         self.axis.direction = 1
         self.axis.start_ramp = 1
@@ -19,12 +16,13 @@ class TestAxis(unittest.TestCase):
         self.axis.ramp_pause = 10
         self.axis.link_to_adc = 0
         self.axis.enable_line_polarity = 1
-        self.axis.pulse_count_change_direction = 0000000000
-        self.axis.pulse_counts_sent_back = 0000000000
-        self.axis.enable_disable_x_pulse_count_replies = 0
-        self.axis.enable_disable_y_pulse_count_replies = 0
-        self.axis.enable_disable_z_pulse_count_replies = 0
-        self.axis.enable_disable_e_pulse_count_replies = 0
+        self.axis.pulse_count_change_direction = 0
+        self.axis.pulse_counts_sent_back = 0
+        self.axis.wait_delay = 0
+        self.axis.enable_disable_x_pulse_count_replies = 1
+        self.axis.enable_disable_y_pulse_count_replies = 1
+        self.axis.enable_disable_z_pulse_count_replies = 1
+        self.axis.enable_disable_e_pulse_count_replies = 1
         self.axis.pause_all_return_x_pulse_count = 0
         self.axis.pause_all_return_y_pulse_count = 0
         self.axis.pause_all_return_z_pulse_count = 0
@@ -64,10 +62,10 @@ class TestAxis(unittest.TestCase):
     def test_set_auto_count_pulse_out(self):
         self.axis.pulse_counts_sent_back = 100
         self.axis.enable_disable_x_pulse_count_replies = 1
-        self.axis.enable_disable_y_pulse_count_replies = 1
-        self.axis.enable_disable_z_pulse_count_replies = 1
-        self.axis.enable_disable_e_pulse_count_replies = 1
-        self.assertEqual("I00JX00000001001111*", self.axis.set_auto_count_pulse_out())
+        self.axis.enable_disable_y_pulse_count_replies = 0
+        self.axis.enable_disable_z_pulse_count_replies = 0
+        self.axis.enable_disable_e_pulse_count_replies = 0
+        self.assertEqual("I00JX00000001001000*", self.axis.set_auto_count_pulse_out())
 
     def test_start(self):
         self.assertEqual("I00SX*", self.axis.start())
@@ -97,7 +95,7 @@ class TestAxis(unittest.TestCase):
         self.assertEqual("I00XP*", self.axis.get_current_pulse_count())
 
     def test_change_speed(self):
-        self.assertEqual("I00QX001000.000*", self.axis.change_speed(frequency=1000.000))
+        self.assertEqual("I00QX001000.000*", self.axis.change_speed(new_frequency=1000.000))
 
     def test_enable_limit_switches(self):
         self.assertEqual("I00KX1*", self.axis.enable_limit_switches())
