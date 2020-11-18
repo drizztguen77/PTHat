@@ -831,6 +831,23 @@ class PTHat:
             print(f"pulse count: {pulse_cnt} = {steps_per_rev} steps per revolution * {total_revs} total revolutions")
         return pulse_cnt
 
+    def calculate_revolutions(self, steps_per_rev, pulse_count):
+        """
+        Calculates the number of revolutions from the steps per revolution and the pulse count.
+
+        Calculation is
+
+        total revs = pulse count / steps per rev
+
+        :param steps_per_rev: steps per revolution
+        :param pulse_count: total pulse count
+        :return: number of revolutions
+        """
+        total_revs = pulse_count / steps_per_rev
+        if self.debug:
+            print(f"total revolutions: {total_revs} = pulse count: {pulse_count} / {steps_per_rev} steps per revolution")
+        return total_revs
+
     def _validate_command(self):
         """
         Validate command settings that are the same for every command

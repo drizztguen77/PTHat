@@ -59,6 +59,9 @@ class TestPthat(unittest.TestCase):
     def test_calculate_pulse_count(self):
         self.assertEqual(self.pthat.calculate_pulse_count(steps_per_rev=200, total_revs=50), 10000)
 
+    def test_calculate_revolutions(self):
+        self.assertEqual(self.pthat.calculate_revolutions(steps_per_rev=200, pulse_count=10000), 50)
+
 
 if __name__ == '__main__':
     unittest.main()

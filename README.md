@@ -61,3 +61,10 @@ To install this package from pypi:
 ```
 pip install pthat
 ```
+
+## TODO
+
+- Example for changing speed
+- Example for changing direction after x number of revolutions
+- Example of reading pulse count and printing number of revolutions
+- 
