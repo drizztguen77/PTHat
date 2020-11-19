@@ -1,2 +1,5 @@
 pyserial~=3.4
 setuptools~=50.3.2
+
+pthat~=0.9.0
+numpy~=1.19.4

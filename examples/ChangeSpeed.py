@@ -6,6 +6,7 @@ This example does not auto send the commands. It gets the command and then sends
 """
 from pthat.pthat import Axis
 import time
+import numpy
 
 ramp_up_speed = 100
 
@@ -26,7 +27,7 @@ def change_speed(axis, old_rpm, new_rpm, ramp_up):
     new_frequency = axis.rpm_to_frequency(rpm=new_rpm, steps_per_rev=steps_per_rev, round_digits=3)
 
     resps = None
-    for x in range(old_frequency, new_frequency, ramp_up):
+    for x in numpy.arange(old_frequency, new_frequency, ramp_up):
         axis.send_command(axis.change_speed(x))
 
         # Check for both reply and complete responses to be returned
