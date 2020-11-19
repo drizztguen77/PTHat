@@ -17,6 +17,16 @@ def show_responses(axis):
         print("No responses received")
 
 
+def wait_for_responses(responses_to_check, msg):
+    responses = xaxis.get_all_responses()
+    while not all(x in responses for x in responses_to_check):
+        responses = responses + xaxis.get_all_responses()
+
+    # Print the responses
+    print(msg)
+    xaxis.parse_responses(responses)
+
+
 steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
 total_revolutions = int(input("How many total revolutions [50]? ") or "50")
 rpm = int(input("How many RPMs [500]? ") or "500")
@@ -38,61 +48,69 @@ set_axis_cmd = xaxis.set_axis(frequency=frequency, pulse_count=pulse_count, dire
 xaxis.send_command(set_axis_cmd)
 
 # Get the responses - look for both responses to be returned before continuing
-responses = xaxis.get_all_responses()
-while not all(x in responses for x in ["RI01CX*", "CI01CX*"]):
-    responses = responses + xaxis.get_all_responses()
-
-# Print the responses
-print(f"------- Set axis command responses -------")
-xaxis.parse_responses(responses)
+wait_for_responses(["RI01CX*", "CI01CX*"], "------- Set axis command responses -------")
+# responses = xaxis.get_all_responses()
+# while not all(x in responses for x in ["RI01CX*", "CI01CX*"]):
+#     responses = responses + xaxis.get_all_responses()
+#
+# # Print the responses
+# print(f"------- Set axis command responses -------")
+# xaxis.parse_responses(responses)
 
 # Start the motor
 xaxis.send_command(xaxis.start())
 
 # Check for both reply and complete responses to be returned
-responses = xaxis.get_all_responses()
-while not all(x in responses for x in ["RI01SX*"]):
-    responses = responses + xaxis.get_all_responses()
-
-# Print the responses
-print(f"------- Start command responses -------")
-xaxis.parse_responses(responses)
+wait_for_responses(["RI01SX*"], "------- Start command responses -------")
+# responses = xaxis.get_all_responses()
+# while not all(x in responses for x in ["RI01SX*"]):
+#     responses = responses + xaxis.get_all_responses()
+#
+# # Print the responses
+# print(f"------- Start command responses -------")
+# xaxis.parse_responses(responses)
 
 input("Press enter to pause: ")
 xaxis.send_command(xaxis.pause())
 
 # Check for the reply response to be returned
-responses = xaxis.get_all_responses()
-while not all(x in responses for x in ["RI01PX*"]):
-    responses = responses + xaxis.get_all_responses()
-
-# Print the responses
-print(f"------- Pause command responses -------")
-xaxis.parse_responses(responses)
+wait_for_responses(["RI01PX*"], "------- Pause command responses -------")
+# responses = xaxis.get_all_responses()
+# while not all(x in responses for x in ["RI01PX*"]):
+#     responses = responses + xaxis.get_all_responses()
+#
+# # Print the responses
+# print(f"------- Pause command responses -------")
+# xaxis.parse_responses(responses)
 
 input("Press enter to resume: ")
 xaxis.send_command(xaxis.resume())
 
 # Check for both reply and complete responses to be returned
-responses = xaxis.get_all_responses()
-while not all(x in responses for x in ["RI01PX*", "CI01PX*"]):
-    responses = responses + xaxis.get_all_responses()
-
-# Print the responses
-print(f"------- Resume command responses -------")
-xaxis.parse_responses(responses)
+wait_for_responses(["RI01PX*", "CI01PX*"], "------- Resume command responses -------")
+# responses = xaxis.get_all_responses()
+# while not all(x in responses for x in ["RI01PX*", "CI01PX*"]):
+#     responses = responses + xaxis.get_all_responses()
+#
+# # Print the responses
+# print(f"------- Resume command responses -------")
+# xaxis.parse_responses(responses)
 
 # Get the pulse count
 xaxis.send_command(xaxis.get_current_pulse_count())
 
 # The response should come back with 3 replies
 pulse_reply = f"XP{xaxis.direction}{xaxis.pulse_count:010}*"
-responses = xaxis.get_all_responses()
-print(responses)
-while not all(x in responses for x in ["RI01XP*", "CI01XP*"]):
-    responses = responses + xaxis.get_all_responses()
-    print(responses)
+wait_for_responses(["RI01XP*", "CI01XP*"], "------- Get pulse count command responses -------")
+# responses = xaxis.get_all_responses()
+# print(responses)
+# while not all(x in responses for x in ["RI01XP*", "CI01XP*"]):
+#     responses = responses + xaxis.get_all_responses()
+#     print(responses)
+#
+# # Print the responses
+# print(f"------- Get pulse count command responses -------")
+# xaxis.parse_responses(responses)
 
-# Print the responses
-print(f"------- Get pulse count command responses -------")
-xaxis.parse_responses(responses)
+# Wait for the start command to complete
+wait_for_responses(["CI01SX*"], "------- Start command responses -------")
