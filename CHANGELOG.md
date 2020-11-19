@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Method to calculate revolutions from pulse count and steps per revolution
+- Added example ChangeSpeed
 
 ##  [0.9.10]
 ### Added
