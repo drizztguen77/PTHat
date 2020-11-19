@@ -46,7 +46,7 @@ xaxis.send_command(xaxis.start())
 
 # Check for both reply and complete responses to be returned
 responses = xaxis.get_all_responses()
-while not all(x in responses for x in ["RI01SX*", "CI01SX*"]):
+while not all(x in responses for x in ["RI01SX*"]):
     responses = responses + xaxis.get_all_responses()
 
 # Print the responses

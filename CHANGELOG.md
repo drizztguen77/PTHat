@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Method to calculate revolutions from pulse count and steps per revolution
 - Added example ChangeSpeed
+- Added example to stop the motor in case a bug is encountered leaving the motor running
 
 ##  [0.9.10]
 ### Added
