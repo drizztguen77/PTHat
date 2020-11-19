@@ -2182,6 +2182,8 @@ class Axis(PTHat):
         """
         This Command changes the speed of each Axis on the fly.
         A Set Axis Command and a Start Command must be used to set the Axis running before this command can be used.
+        Note that this command does not have a ramp up and ramp down value so speed adjustments must be made in smaller
+        increments with a stepper motor so as to not cause it to stall.
 
         :param new_frequency: new frequency to change the speed to, 0.0-125000.0 - required
         :return: the command to send to the serial port

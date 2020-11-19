@@ -7,6 +7,8 @@ This example does not auto send the commands. It gets the command and then sends
 from pthat.pthat import Axis
 import time
 
+ramp_up_speed = 100
+
 
 def show_responses(axis):
     resps = axis.get_all_responses()
@@ -18,18 +20,22 @@ def show_responses(axis):
         print("No responses received")
 
 
-def change_speed(axis, revspermin):
+def change_speed(axis, old_rpm, new_rpm, ramp_up):
     time.sleep(3)
-    new_frequency = axis.rpm_to_frequency(rpm=revspermin, steps_per_rev=steps_per_rev, round_digits=3)
-    axis.send_command(axis.change_speed(new_frequency))
+    old_frequency = axis.rpm_to_frequency(rpm=old_rpm, steps_per_rev=steps_per_rev, round_digits=3)
+    new_frequency = axis.rpm_to_frequency(rpm=new_rpm, steps_per_rev=steps_per_rev, round_digits=3)
 
-    # Check for both reply and complete responses to be returned
-    resps = axis.get_all_responses()
-    while not all(x in resps for x in ["RI01QX*", "CI01QX*"]):
-        resps = resps + axis.get_all_responses()
+    resps = None
+    for x in range(old_frequency, new_frequency, ramp_up):
+        axis.send_command(axis.change_speed(x))
+
+        # Check for both reply and complete responses to be returned
+        resps = axis.get_all_responses()
+        while not all(x in resps for x in ["RI01QX*", "CI01QX*"]):
+            resps = resps + axis.get_all_responses()
 
     # Print the responses
-    print(f"------- Speed changed to {revspermin} - command responses -------")
+    print(f"------- Speed changed to {new_rpm} - command responses -------")
     xaxis.parse_responses(resps)
 
 
@@ -69,8 +75,19 @@ print(f"------- Start command responses -------")
 xaxis.parse_responses(responses)
 
 # Change the speed
-change_speed(xaxis, rpm + 100)
-change_speed(xaxis, rpm + 300)
+# First calculate the ramp up frequency for the original speed
+frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
+ramp_up_freq = frequency / ramp_up_speed
+
+# Speed up 100 RPM's
+new_speed_rpm_100 = rpm + 100
+change_speed(xaxis, rpm, new_speed_rpm_100, ramp_up_freq)
+
+# Speed up 200 more RPM's
+new_speed_rpm_300 = new_speed_rpm_100 + 200
+change_speed(xaxis, new_speed_rpm_100, new_speed_rpm_300, ramp_up_freq)
+
+time.sleep(3)
 
 # Shut it all down
 xaxis.send_command(xaxis.stop())
