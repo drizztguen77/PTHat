@@ -7,14 +7,14 @@ This example does not auto send the commands. It gets the command and then sends
 from pthat.pthat import Axis
 
 
-def show_responses(axis):
+def wait_for_responses(axis, responses_to_check, msg):
     responses = axis.get_all_responses()
+    while not all(x in responses for x in responses_to_check):
+        responses = responses + axis.get_all_responses()
 
-    # Parse the responses
-    if responses is not None:
-        axis.parse_responses(responses)
-    else:
-        print("No responses received")
+    # Print the responses
+    print(msg)
+    axis.parse_responses(responses)
 
 
 xaxis = Axis("X", command_id=1, serial_device="/dev/ttyS0")
@@ -25,4 +25,4 @@ firmware_version_cmd = xaxis.get_firmware_version()
 xaxis.send_command(firmware_version_cmd)
 
 # Show the responses
-show_responses(xaxis)
+wait_for_responses(xaxis, ["RI00FW*", "CI00FW*"], "------- Get firmware version command responses -------")

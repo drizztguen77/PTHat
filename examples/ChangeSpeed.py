@@ -10,14 +10,14 @@ import time
 ramp_up_speed = 100
 
 
-def show_responses(axis):
-    resps = axis.get_all_responses()
+def wait_for_responses(axis, responses_to_check, msg):
+    responses = axis.get_all_responses()
+    while not all(x in responses for x in responses_to_check):
+        responses = responses + axis.get_all_responses()
 
-    # Parse the responses
-    if resps is not None:
-        axis.parse_responses(resps)
-    else:
-        print("No responses received")
+    # Print the responses
+    print(msg)
+    axis.parse_responses(responses)
 
 
 def change_speed(axis, old_rpm, new_rpm, ramp_up):
@@ -30,9 +30,7 @@ def change_speed(axis, old_rpm, new_rpm, ramp_up):
         axis.send_command(axis.change_speed(x))
 
         # Check for both reply and complete responses to be returned
-        resps = axis.get_all_responses()
-        while not all(x in resps for x in ["RI01QX*", "CI01QX*"]):
-            resps = resps + axis.get_all_responses()
+        wait_for_responses(xaxis, ["RI01QX*", "CI01QX*"], "")
 
     # Print the responses
     print(f"------- Speed changed to {new_rpm} - command responses -------")
@@ -52,27 +50,13 @@ frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_d
 set_axis_cmd = xaxis.set_axis(frequency=frequency, pulse_count=pulse_count, direction=direction,
                               start_ramp=1, finish_ramp=1, ramp_divide=100, ramp_pause=10, enable_line_polarity=1)
 xaxis.send_command(set_axis_cmd)
-
 # Get the responses - look for both responses to be returned before continuing
-responses = xaxis.get_all_responses()
-while not all(x in responses for x in ["RI01CX*", "CI01CX*"]):
-    responses = responses + xaxis.get_all_responses()
-
-# Print the responses
-print(f"------- Set axis command responses -------")
-xaxis.parse_responses(responses)
+wait_for_responses(xaxis, ["RI01CX*", "CI01CX*"], "------- Set axis command responses -------")
 
 # Start the motor
 xaxis.send_command(xaxis.start())
-
 # Check for both reply and complete responses to be returned
-responses = xaxis.get_all_responses()
-while not all(x in responses for x in ["RI01SX*"]):
-    responses = responses + xaxis.get_all_responses()
-
-# Print the responses
-print(f"------- Start command responses -------")
-xaxis.parse_responses(responses)
+wait_for_responses(xaxis, ["RI01SX*"], "------- Start command responses -------")
 
 # Change the speed
 # First calculate the ramp up frequency for the original speed
@@ -92,12 +76,5 @@ time.sleep(3)
 
 # Shut it all down
 xaxis.send_command(xaxis.stop())
-
 # Check for both reply and complete responses to be returned
-responses = xaxis.get_all_responses()
-while not all(x in responses for x in ["RI01TX*", "CI01SX*"]):
-    responses = responses + xaxis.get_all_responses()
-
-# Print the responses
-print(f"------- Stop command responses -------")
-xaxis.parse_responses(responses)
+wait_for_responses(xaxis, ["RI01TX*", "CI01SX*"], "------- Stop command responses -------")
