@@ -61,8 +61,26 @@ xaxis.parse_responses(responses)
 input("Press enter to pause: ")
 xaxis.send_command(xaxis.pause())
 
+# Check for the reply response to be returned
+responses = xaxis.get_all_responses()
+while not all(x in responses for x in ["RI01PX*"]):
+    responses = responses + xaxis.get_all_responses()
+
+# Print the responses
+print(f"------- Pause command responses -------")
+xaxis.parse_responses(responses)
+
 input("Press enter to resume: ")
 xaxis.send_command(xaxis.resume())
+
+# Check for both reply and complete responses to be returned
+responses = xaxis.get_all_responses()
+while not all(x in responses for x in ["RI01PX*", "CI01PX*"]):
+    responses = responses + xaxis.get_all_responses()
+
+# Print the responses
+print(f"------- Resume command responses -------")
+xaxis.parse_responses(responses)
 
 # Get the pulse count
 xaxis.send_command(xaxis.get_current_pulse_count())
