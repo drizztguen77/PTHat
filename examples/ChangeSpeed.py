@@ -19,8 +19,8 @@ def show_responses(axis):
 
 
 steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
-direction = 0
-rpm = 300
+direction = 0               # Forward
+rpm = 300                   # Start RPM
 pulse_count = 4294967295    # Set to max so we can start and stop it when desired
 
 xaxis = Axis("X", command_id=1, serial_device="/dev/ttyS0")
@@ -28,7 +28,7 @@ xaxis.debug = True
 
 # Setup the axis with values to start the motor
 frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
-set_axis_cmd = xaxis.set_axis(frequency=frequency, direction=direction,
+set_axis_cmd = xaxis.set_axis(frequency=frequency, pulse_count=pulse_count, direction=direction,
                               start_ramp=1, finish_ramp=1, ramp_divide=100, ramp_pause=10, enable_line_polarity=1)
 xaxis.send_command(set_axis_cmd)
 
