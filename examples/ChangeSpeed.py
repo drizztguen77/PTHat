@@ -18,6 +18,21 @@ def show_responses(axis):
         print("No responses received")
 
 
+def change_speed(axis, revspermin):
+    time.sleep(3)
+    new_frequency = axis.rpm_to_frequency(rpm=revspermin, steps_per_rev=steps_per_rev, round_digits=3)
+    axis.send_command(axis.change_speed(new_frequency))
+
+    # Check for both reply and complete responses to be returned
+    resps = axis.get_all_responses()
+    while not all(x in resps for x in ["RI01QX*", "CI01QX*"]):
+        resps = resps + axis.get_all_responses()
+
+    # Print the responses
+    print(f"------- Speed changed to {revspermin} - command responses -------")
+    xaxis.parse_responses(resps)
+
+
 steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
 direction = 0               # Forward
 rpm = 300                   # Start RPM
@@ -53,33 +68,9 @@ while not all(x in responses for x in ["RI01SX*"]):
 print(f"------- Start command responses -------")
 xaxis.parse_responses(responses)
 
-# Increment the speed 3 times by 100 rpm each time
-for x in range(3):
-    time.sleep(3)
-
-    rpm = rpm + 100
-    new_frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
-    xaxis.send_command(xaxis.change_speed(new_frequency))
-
-    # Check for both reply and complete responses to be returned
-    responses = xaxis.get_all_responses()
-    while not all(x in responses for x in ["RI01QX*", "CI01QX*"]):
-        responses = responses + xaxis.get_all_responses()
-    print(f"------- Speed changed to {rpm} - command responses -------")
-
-# Decrement the speed twice times by 100 rpm each time
-# for x in range(2):
-#     time.sleep(3)
-#
-#     rpm = rpm - 100
-#     new_frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
-#     xaxis.send_command(xaxis.change_speed(new_frequency))
-#
-#     # Check for both reply and complete responses to be returned
-#     responses = xaxis.get_all_responses()
-#     while not all(x in responses for x in ["RI01QX*", "CI01QX*"]):
-#         responses = responses + xaxis.get_all_responses()
-#     print(f"------- Speed changed to {rpm} - command responses -------")
+# Change the speed
+change_speed(xaxis, rpm + 100)
+change_speed(xaxis, rpm + 200)
 
 # Shut it all down
 xaxis.send_command(xaxis.stop())
