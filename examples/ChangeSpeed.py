@@ -1,6 +1,6 @@
 """
 This is an example of setting up an Axis (motor) and starting it, revving it up to a specified RPM, then changing the
-speed up and down and then finally shutting it down.
+speed up and then finally shutting it down.
 
 This example does not auto send the commands. It gets the command and then sends it to the send_command method.
 """
