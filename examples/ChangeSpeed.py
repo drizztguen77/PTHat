@@ -78,15 +78,14 @@ xaxis.parse_responses(responses)
 # First calculate the ramp up frequency for the original speed
 frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
 # ramp_up_freq = frequency / ramp_up_speed
+ramp_up_freq = 160
 
 # Speed up 100 RPM's
 new_speed_rpm_100 = rpm + 100
-ramp_up_freq = (new_speed_rpm_100 - rpm) / ramp_up_speed
 change_speed(xaxis, rpm, new_speed_rpm_100, ramp_up_freq)
 
 # Speed up 200 more RPM's
 new_speed_rpm_200 = new_speed_rpm_100 + 200
-ramp_up_freq = (new_speed_rpm_200 - new_speed_rpm_100) / ramp_up_speed
 change_speed(xaxis, new_speed_rpm_100, new_speed_rpm_200, ramp_up_freq)
 
 time.sleep(3)
