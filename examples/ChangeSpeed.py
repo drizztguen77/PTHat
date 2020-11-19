@@ -68,18 +68,18 @@ for x in range(3):
     print(f"------- Speed changed to {rpm} - command responses -------")
 
 # Decrement the speed twice times by 100 rpm each time
-for x in range(2):
-    time.sleep(3)
-
-    rpm = rpm - 100
-    new_frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
-    xaxis.send_command(xaxis.change_speed(new_frequency))
-
-    # Check for both reply and complete responses to be returned
-    responses = xaxis.get_all_responses()
-    while not all(x in responses for x in ["RI01QX*", "CI01QX*"]):
-        responses = responses + xaxis.get_all_responses()
-    print(f"------- Speed changed to {rpm} - command responses -------")
+# for x in range(2):
+#     time.sleep(3)
+#
+#     rpm = rpm - 100
+#     new_frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
+#     xaxis.send_command(xaxis.change_speed(new_frequency))
+#
+#     # Check for both reply and complete responses to be returned
+#     responses = xaxis.get_all_responses()
+#     while not all(x in responses for x in ["RI01QX*", "CI01QX*"]):
+#         responses = responses + xaxis.get_all_responses()
+#     print(f"------- Speed changed to {rpm} - command responses -------")
 
 # Shut it all down
 xaxis.send_command(xaxis.stop())
