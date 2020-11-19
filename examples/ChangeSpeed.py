@@ -70,7 +70,7 @@ xaxis.parse_responses(responses)
 
 # Change the speed
 change_speed(xaxis, rpm + 100)
-change_speed(xaxis, rpm + 200)
+change_speed(xaxis, rpm + 300)
 
 # Shut it all down
 xaxis.send_command(xaxis.stop())
