@@ -11,7 +11,10 @@ ramp_up_speed = int(input("Enter ramp up speed: "))
 steps_per_rev = int(input("Enter the steps per revolution: "))
 
 frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
-ramp_up_freq = frequency / ramp_up_speed
+if ramp_up_speed == 0:
+    ramp_up_freq = frequency
+else:
+    ramp_up_freq = frequency / ramp_up_speed
 ramp_up_rpm = xaxis.frequency_to_rpm(frequency=ramp_up_freq, steps_per_rev=steps_per_rev)
 
 print(f"Ramp up: {ramp_up_freq} Hz = {ramp_up_rpm} RPM")
