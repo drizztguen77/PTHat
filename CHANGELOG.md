@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added example ChangeSpeed
 - Added example to stop the motor in case a bug is encountered leaving the motor running
 - Added CalculateRampUp script to help with testing and checking values
+- Most documentation
+
+### Changed
+- Documentation in the pthat module to be compatible with Sphinx
+- The SimpleAxis example to allow ramp divide and pause to be input so higher speeds could be tested
 
 ##  [0.9.10]
 ### Added
