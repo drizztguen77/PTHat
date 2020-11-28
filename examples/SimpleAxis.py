@@ -20,6 +20,8 @@ def wait_for_responses(axis, responses_to_check, msg):
 steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
 total_revolutions = int(input("How many total revolutions [50]? ") or "50")
 rpm = int(input("How many RPMs [500]? ") or "500")
+ramp_divide = int(input("Ramp divide [200]?") or "200")
+ramp_pause = int(input("Ramp pause [20]?") or "20")
 direct = input("Direction (Forward = F, Reverse = R) [F]? ") or "F"
 direction = 0
 if direct.upper() == "F":
@@ -34,7 +36,7 @@ xaxis.debug = True
 frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
 pulse_count = xaxis.calculate_pulse_count(steps_per_rev, total_revolutions)
 set_axis_cmd = xaxis.set_axis(frequency=frequency, pulse_count=pulse_count, direction=direction,
-                              start_ramp=1, finish_ramp=1, ramp_divide=100, ramp_pause=10, enable_line_polarity=1)
+                              start_ramp=1, finish_ramp=1, ramp_divide=ramp_divide, ramp_pause=ramp_pause, enable_line_polarity=1)
 xaxis.send_command(set_axis_cmd)
 # Get the responses - look for both responses to be returned before continuing
 wait_for_responses(xaxis, ["RI01CX*", "CI01CX*"], "------- Set axis command responses -------")

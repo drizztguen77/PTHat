@@ -67,4 +67,4 @@ pip install pthat
 - Example for changing direction after x number of revolutions
 - Example of reading pulse count and printing number of revolutions
 - Async sending and reading the serial device
-- 
+
