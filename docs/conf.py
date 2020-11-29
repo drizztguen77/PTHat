@@ -22,10 +22,10 @@ copyright = '2020, Curtis White'
 author = 'Curtis White'
 
 # The full version, including alpha/beta/rc tags
-version = '0.9'
+version = '1.0'
 
 # The full version, including alpha/beta/rc tags
-release = '0.9.11'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------

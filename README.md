@@ -64,11 +64,12 @@ pip install pthat
 
 ## Version
 
-When the version is changed, there are currently three places the version number
+When the version is changed, there are currently four places the version number
 must be changed
 - pthat.py - _version variable
 - setup.py - version parameter
 - CHANGELOG.md
+- docs/conf.py - version and release variables
 
 
 ## TODO
