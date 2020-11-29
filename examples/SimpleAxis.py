@@ -21,8 +21,8 @@ steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
 total_revolutions = int(input("How many total revolutions [50]? ") or "50")
 rpm = int(input("How many RPMs [500]? ") or "500")
 rdc = int(rpm / 10)      # Calculate ramp divide. 10% of rpm seems to work at least up to 1500 rpm
-ramp_divide = int(input(f"Ramp divide [{rdc}]? ") or f"{rdc}")
-ramp_pause = int(input("Ramp pause [10]? ") or "10")
+ramp_divide = int(input(f"Ramp divide 0-255 [{rdc}]? ") or f"{rdc}")
+ramp_pause = int(input("Ramp pause 0-255 [10]? ") or "10")
 direct = input("Direction (Forward = F, Reverse = R) [F]? ") or "F"
 direction = 0
 if direct.upper() == "F":

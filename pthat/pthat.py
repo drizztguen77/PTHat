@@ -21,50 +21,50 @@ the supporting classes extend the PTHat class.
 
 .. code-block:: python
 
-    from pthat.pthat import Axis
+   from pthat.pthat import Axis
 
 
-    def wait_for_responses(axis, responses_to_check, msg):
-        responses = axis.get_all_responses()
-        while not all(x in responses for x in responses_to_check):
-            responses = responses + axis.get_all_responses()
+   def wait_for_responses(axis, responses_to_check, msg):
+       responses = axis.get_all_responses()
+       while not all(x in responses for x in responses_to_check):
+           responses = responses + axis.get_all_responses()
 
-        # Print the responses
-        print(msg)
-        axis.parse_responses(responses)
+       # Print the responses
+       print(msg)
+       axis.parse_responses(responses)
 
 
-    steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
-    total_revolutions = int(input("How many total revolutions [50]? ") or "50")
-    rpm = int(input("How many RPMs [500]? ") or "500")
-    direct = input("Direction (Forward = F, Reverse = R) [F]? ") or "F"
-    direction = 0
-    if direct.upper() == "F":
-        direction = 0
-    else:
-        direction = 1
+   steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
+   total_revolutions = int(input("How many total revolutions [50]? ") or "50")
+   rpm = int(input("How many RPMs [500]? ") or "500")
+   direct = input("Direction (Forward = F, Reverse = R) [F]? ") or "F"
+   direction = 0
+   if direct.upper() == "F":
+       direction = 0
+   else:
+       direction = 1
 
-    xaxis = Axis("X", command_id=1, serial_device="/dev/ttyS0")
-    xaxis.debug = True
+   xaxis = Axis("X", command_id=1, serial_device="/dev/ttyS0")
+   xaxis.debug = True
 
-    # Setup the axis with values to start the motor
-    frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
-    pulse_count = xaxis.calculate_pulse_count(steps_per_rev, total_revolutions)
-    set_axis_cmd = xaxis.set_axis(frequency=frequency, pulse_count=pulse_count, direction=direction,
-                                  start_ramp=1, finish_ramp=1, ramp_divide=100, ramp_pause=10, enable_line_polarity=1)
-    xaxis.send_command(set_axis_cmd)
-    # Get the responses - look for both responses to be returned before continuing
-    wait_for_responses(xaxis, ["RI01CX*", "CI01CX*"], "------- Set axis command responses -------")
+   # Setup the axis with values to start the motor
+   frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
+   pulse_count = xaxis.calculate_pulse_count(steps_per_rev, total_revolutions)
+   set_axis_cmd = xaxis.set_axis(frequency=frequency, pulse_count=pulse_count, direction=direction,
+                                 start_ramp=1, finish_ramp=1, ramp_divide=100, ramp_pause=10, enable_line_polarity=1)
+   xaxis.send_command(set_axis_cmd)
+   # Get the responses - look for both responses to be returned before continuing
+   wait_for_responses(xaxis, ["RI01CX*", "CI01CX*"], "------- Set axis command responses -------")
 
-    # Start the motor
-    xaxis.send_command(xaxis.start())
-    # Check for both reply and complete responses to be returned
-    wait_for_responses(xaxis, ["RI01SX*", "CI01SX*"], "------- Start command responses -------")
+   # Start the motor
+   xaxis.send_command(xaxis.start())
+   # Check for both reply and complete responses to be returned
+   wait_for_responses(xaxis, ["RI01SX*", "CI01SX*"], "------- Start command responses -------")
 
-    # Get the pulse count
-    xaxis.send_command(xaxis.get_current_pulse_count())
-    # The response should come back with 3 replies
-    wait_for_responses(xaxis, ["RI01XP*", "CI01XP*"], "------- Get pulse count command responses -------")
+   # Get the pulse count
+   xaxis.send_command(xaxis.get_current_pulse_count())
+   # The response should come back with 3 replies
+   wait_for_responses(xaxis, ["RI01XP*", "CI01XP*"], "------- Get pulse count command responses -------")
 """
 import serial
 
@@ -90,7 +90,7 @@ class PTHat:
        :type test_mode: boolean, optional
     """
     # Properties
-    _version = "0.9.10"  # Version of this API
+    _version = "1.0.0"  # Version of this API
     command_type = "I"
     """
     | Type of command, instant or buffer. This can be set directly.
@@ -107,7 +107,7 @@ class PTHat:
     """
     test_mode = False
     """
-    This lets all methods to be run without actually sending them to the serial port
+    This lets all methods to be run without actually sending them to the serial port. This can be set directly.
     """
     wait_delay = 0
     """
@@ -117,11 +117,11 @@ class PTHat:
     """
     auto_send_command = False
     """
-    Automatically send the command when command methods are called
+    Automatically send the command when command methods are called. This can be set directly.
     """
     serial = None
     """
-    The path to the serial device such as /dev/ttyS0
+    The path to the serial device such as /dev/ttyS0. This can be set directly.
     """
 
     _motor_enabled = False   # Specifies if the motor is enabled or not. Do not set this as it is set internally
@@ -175,6 +175,7 @@ class PTHat:
         """
         | Specifies if the motor is enabled or not. Do not set this as it is set internally.
         | Read-only property
+
         :returns: True or False
         :rtype: bool
         """
@@ -185,6 +186,7 @@ class PTHat:
         """
         | If received command replies are enabled or not.
         | Read-only property
+
         :returns: True or False
         :rtype: bool
         """
@@ -195,6 +197,7 @@ class PTHat:
         """
         | If completed command replies are enabled or not.
         | Read-only property
+
         :returns: True or False
         :rtype: bool
         """
@@ -205,6 +208,7 @@ class PTHat:
         """
         | Serial command ending character. Set to \*.
         | Read-only property
+
         :returns: command end character
         :rtype: str
         """
@@ -215,6 +219,9 @@ class PTHat:
         """
         | Version of this API.
         | Read-only property
+
+        :returns: version number
+        :rtype: str
         """
         return self._version
 
@@ -249,7 +256,7 @@ class PTHat:
 
         :param command: command to send
 
-        .. todo:: make asynchronous
+        .. todo: make asynchronous
         """
         if not self.test_mode:
             self.__serial.write(bytes(command, 'utf-8'))
@@ -261,7 +268,7 @@ class PTHat:
         :returns: a list of responses
         :rtype: list
 
-        .. todo:: make asynchronous and implement callback that the responses are sent to
+        .. todo: make asynchronous and implement callback that the responses are sent to
         """
         responses = []
 
@@ -275,7 +282,7 @@ class PTHat:
 
     def get_response(self):
         """
-        This method gets a single response. A response is the value returned up to an *.
+        This method gets a single response. A response is the value returned up to an \*.
 
         :returns: a single response as a string
         :rtype: str
@@ -316,20 +323,20 @@ class PTHat:
 
         **Command**
 
-        +----------+------------+------------+----------------------------------------------------------------------------------+
-        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |  Byte 6                                                                          |
-        +==========+============+============+==================================================================================+
-        |    I     |     00     |     LI     |   \*                                                                             |
-        +----------+------------+------------+----------------------------------------------------------------------------------+
+        +----------+------------+------------+-----------+----------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |  Byte 6   |                                                                      |
+        +==========+============+============+===========+======================================================================+
+        |    I     |     00     |     LI     |   \*      |                                                                      |
+        +----------+------------+------------+-----------+----------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
         +===========+======================+==========================================================================+
-        | Byte 1    | I=Instant Command    | Sets command to either Instant or Buffer.                                |
-        |           | B=Buffer Command     |                                                                          |
+        | Byte 1    | | I=Instant Command  | Sets command to either Instant or Buffer.                                |
+        |           | | B=Buffer Command   |                                                                          |
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte 2-3  | 0-99                 | Optional Command ID                                                      |
         +-----------+----------------------+--------------------------------------------------------------------------+
@@ -339,25 +346,25 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         In this case the received command will be sent back along with the state of the ES/Limit inputs and then
         completed command. If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
 
-        +--------------------------------------------+------------------------------------+---------------------------------------------------------------------+
-        | IO Port Status Received \*Result\*         | IO Port Status Completed           |                                                                     |
-        +============================================+====================================+=====================================================================+
-        |        RI00LI**Result*                     |         CI00LI*                    |                                                                     |
-        +--------------------------------------------+------------------------------------+---------------------------------------------------------------------+
-        |  | *Result* will show as                                                        |                                                                     |
-        |  | L11111*                                                                      |                                                                     |
-        |  | Bit5=ES input                                                                |                                                                     |
-        |  | Bit4=X Limit input                                                           |                                                                     |
-        |  | Bit3=Y Limit input                                                           |                                                                     |
-        |  | Bit2=Z Limit input                                                           |                                                                     |
-        |  | Bit1=E Limit input                                                           |                                                                     |
-        +--------------------------------------------+------------------------------------+---------------------------------------------------------------------+
+        +----------------------------------------+------------------------------+---------------------------------------------------------------------+
+        | IO Port Status Received \*Result\*     | IO Port Status Completed     |                                                                     |
+        +========================================+==============================+=====================================================================+
+        |        RI00LI**Result*                 |         CI00LI*              |                                                                     |
+        +----------------------------------------+------------------------------+---------------------------------------------------------------------+
+        |  | *Result* will show as                                              |                                                                     |
+        |  | L11111*                                                            |                                                                     |
+        |  | Bit5=ES input                                                      |                                                                     |
+        |  | Bit4=X Limit input                                                 |                                                                     |
+        |  | Bit3=Y Limit input                                                 |                                                                     |
+        |  | Bit2=Z Limit input                                                 |                                                                     |
+        |  | Bit1=E Limit input                                                 |                                                                     |
+        +----------------------------------------+------------------------------+---------------------------------------------------------------------+
         """
         if not self._validate_command():
             return False
@@ -383,14 +390,14 @@ class PTHat:
 
         **Command**
 
-        +----------+------------+------------+----------------------------------------------------------------------------------+
+        +----------+------------+------------+------------+---------------------------------------------------------------------+
         |  Byte 1  |  Byte 2-3  |  Byte 4-5  |  Byte 6-9  |  Byte 10                                                            |
-        +==========+============+============+==================================================================================+
+        +==========+============+============+============+=====================================================================+
         |    I     |     00     |     WW     |    1000    |    \*                                                               |
-        +----------+------------+------------+----------------------------------------------------------------------------------+
+        +----------+------------+------------+------------+---------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
@@ -410,7 +417,7 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
@@ -459,7 +466,7 @@ class PTHat:
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
@@ -475,7 +482,7 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
@@ -514,7 +521,7 @@ class PTHat:
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
@@ -531,7 +538,7 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
@@ -571,7 +578,7 @@ class PTHat:
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
@@ -588,7 +595,7 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
@@ -628,7 +635,7 @@ class PTHat:
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
@@ -645,7 +652,7 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
@@ -685,7 +692,7 @@ class PTHat:
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
@@ -702,7 +709,7 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
@@ -742,7 +749,7 @@ class PTHat:
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +----------+----------------------+---------------------------------------------------------------------------+
         | Byte	   | Setting	          | Description                                                               |
@@ -758,7 +765,7 @@ class PTHat:
         +----------+----------------------+---------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
@@ -797,7 +804,7 @@ class PTHat:
         +------------+--------------+---------------------------------------------------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +------------+--------------------+----------------------------------------+-------------------------------------------------------------------------------------+
         | Byte       | Setting	          | Description                            |                                                                                     |
@@ -808,7 +815,7 @@ class PTHat:
         +------------+--------------------+----------------------------------------+-------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives this command.
 
@@ -863,7 +870,7 @@ class PTHat:
         +-----------+---------------+------------+--------------------------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
@@ -876,7 +883,7 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives this command.
 
@@ -909,7 +916,7 @@ class PTHat:
         +-----------+---------------+------------+--------------------------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
@@ -922,7 +929,7 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command.
 
@@ -958,7 +965,7 @@ class PTHat:
         +-----------+---------------+------------+--------------------------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +-----------+----------------------+--------------------------------------------------------------------------+
         | Byte	    | Setting	           | Description                                                              |
@@ -971,7 +978,7 @@ class PTHat:
         +-----------+----------------------+--------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command.
 
@@ -990,28 +997,28 @@ class PTHat:
 
     def rpm_to_frequency(self, rpm, steps_per_rev, round_digits):
         """
-        Convert RPM to frequency
-
-        Formula for calculating stepping motor speed.
-        Below is the RPM formula for stepping motor drives that use pulse signals to create motion.
-
-        RPM = a/360 * fz * 60
-
-        RPM = Revolutions per minute.
-        “a” = step angle (degrees of rotation per step)
-        “fz” = pulse frequency in hertz
-
-        step angle = degrees of rotation (360) / steps per revolution
-
-        Example 1:  Drive step resolution is set for 1000 steps per revolution.
-        Find step angle: 360 (degrees of rotation) divided by 1000 (steps per revolution) =
-                .36 (degrees of rotation per step)
-        With input frequency of 1000hz, .36 / 360 * 1000 * 60 = 60 rpm
-
-        Example 2: Drive step resolution is set for 500 steps per revolution.
-        Find step angle: 360 (degrees of rotation) divided by 500 (steps per revolution) =
-                .72 (degrees of rotation per step)
-        With input frequency of 1000hz, .72 / 360 * 1000 * 60 = 120 rpm.
+        | Convert RPM to frequency
+        |
+        | Formula for calculating stepping motor speed.
+        | Below is the RPM formula for stepping motor drives that use pulse signals to create motion.
+        |
+        | RPM = a/360 * fz * 60
+        |
+        | RPM = Revolutions per minute.
+        | "a" = step angle (degrees of rotation per step)
+        | "fz" = pulse frequency in hertz
+        |
+        | step angle = degrees of rotation (360) / steps per revolution
+        |
+        | Example 1:  Drive step resolution is set for 1000 steps per revolution.
+        | Find step angle: 360 (degrees of rotation) divided by 1000 (steps per revolution) =
+        |         .36 (degrees of rotation per step)
+        | With input frequency of 1000hz, .36 / 360 * 1000 * 60 = 60 rpm
+        |
+        | Example 2: Drive step resolution is set for 500 steps per revolution.
+        | Find step angle: 360 (degrees of rotation) divided by 500 (steps per revolution) =
+        |        .72 (degrees of rotation per step)
+        | With input frequency of 1000hz, .72 / 360 * 1000 * 60 = 120 rpm.
 
         :param round_digits number of digits to round to
         :param rpm  RPM to convert
@@ -1037,23 +1044,23 @@ class PTHat:
 
     def frequency_to_rpm(self, frequency, steps_per_rev):
         """
-        Convert frequency to RPM
-
-        Formula for calculating stepping motor speed.
-        Below is the frequency formula for stepping motor drives that use pulse signals to create motion.
-
-        To find required frequency to meet desired speed we must find Fz:
-        Fz = RPM / ( (a/360) * 60)
-
-        “fz” = pulse frequency in hertz
-        “a” = step angle (degrees of rotation per step)
-        RPM = Revolutions per minute.
-
-        step angle = degrees of rotation (360) / steps per revolution
-
-        Step 1. Divide step angle by 360:  .36/360 = .001,  then multiply by 60 (seconds) .001 * 60 = .06
-        Step 2. Divide desired speed by .06: Desired speed of 500 rpm’s.   Therefore ; 500 / .06 = 8333.33
-            ( 8333.33 is the frequency in hertz required to reach 500 rpm’s for drive set at 1000 steps per revolution)
+        | Convert frequency to RPM
+        |
+        | Formula for calculating stepping motor speed.
+        | Below is the frequency formula for stepping motor drives that use pulse signals to create motion.
+        |
+        | To find required frequency to meet desired speed we must find Fz:
+        | Fz = RPM / ( (a/360) * 60)
+        |
+        | "fz" = pulse frequency in hertz
+        | "a" = step angle (degrees of rotation per step)
+        | RPM = Revolutions per minute.
+        |
+        | step angle = degrees of rotation (360) / steps per revolution
+        |
+        | Step 1. Divide step angle by 360:  .36/360 = .001,  then multiply by 60 (seconds) .001 * 60 = .06
+        | Step 2. Divide desired speed by .06: Desired speed of 500 rpm’s.   Therefore ; 500 / .06 = 8333.33
+        |    ( 8333.33 is the frequency in hertz required to reach 500 rpm’s for drive set at 1000 steps per revolution)
 
         :param frequency    the frequency
         :param steps_per_rev    steps per revolution
@@ -1068,11 +1075,11 @@ class PTHat:
 
     def calculate_pulse_count(self, steps_per_rev, total_revs):
         """
-        Calculates the pulse count from the steps per revolution and the total revolutions desired.
-
-        Calculation is
-
-        pulse count = steps per rev * total revs
+        | Calculates the pulse count from the steps per revolution and the total revolutions desired.
+        |
+        | Calculation is
+        |
+        | pulse count = steps per rev * total revs
 
         :param steps_per_rev: steps per revolution
         :param total_revs: total revolutions desired
@@ -1086,11 +1093,11 @@ class PTHat:
 
     def calculate_revolutions(self, steps_per_rev, pulse_count):
         """
-        Calculates the number of revolutions from the steps per revolution and the pulse count.
-
-        Calculation is
-
-        total revs = pulse count / steps per rev
+        | Calculates the number of revolutions from the steps per revolution and the pulse count.
+        |
+        | Calculation is
+        |
+        | total revs = pulse count / steps per rev
 
         :param steps_per_rev: steps per revolution
         :param pulse_count: total pulse count
@@ -1105,6 +1112,7 @@ class PTHat:
     def _validate_command(self):
         """
         Validate command settings that are the same for every command
+
         :returns: true if the command settings are valid, otherwise false
         :rtype: bool
         """
@@ -1123,6 +1131,7 @@ class PTHat:
     def _validate_values(self, value, start, end):
         """
         Check an value against start and end to make sure it is between them
+
         :param value: value to check
         :param start: start value
         :param end: end value
@@ -1151,91 +1160,91 @@ class Axis(PTHat):
     # Properties
     axis = "X"
     """
-    | The axis this object represents
+    | The axis this object represents. This can be set directly.
     | X, Y, Z or E or A (all)
     """
     frequency = 0.0
     """
-    Frequency of the pulse train - 000000.000 - 500000.000
+    Frequency of the pulse train - 000000.000 - 500000.000. This can be set directly.
     """
     pulse_count = 0
     """
-    Required pulse count - 0000000000 - 4294967295
+    Required pulse count - 0000000000 - 4294967295. This can be set directly.
     """
     direction = 0
     """
-    Direction - 0 = clockwise (cw - forward), 1 = counter clockwise (ccw - reverse)
+    Direction - 0 = clockwise (cw - forward), 1 = counter clockwise (ccw - reverse). This can be set directly.
     """
     start_ramp = 0
     """
-    Start ramp - 0 = No Ramp, 1 = Ramp
+    Start ramp - 0 = No Ramp, 1 = Ramp. This can be set directly.
     """
     finish_ramp = 0
     """
-    Finish ramp - 0 = No Ramp, 1 = Ramp
+    Finish ramp - 0 = No Ramp, 1 = Ramp. This can be set directly.
     """
     ramp_divide = 0
     """
-    Ramp divide. Divides target frequency by this value for each ramp increment. 0 - 255
+    Ramp divide. Divides target frequency by this value for each ramp increment. 0 - 255. This can be set directly.
     """
     ramp_pause = 0
     """
-    Ramp pause between each ramp increment. 0 - 255
+    Ramp pause between each ramp increment. 0 - 255. This can be set directly.
     """
     link_to_adc = 0
     """
-    Link to ADC - 0 = No ADC, 1 = Link to ADC1, 2= Link to ADC2
+    Link to ADC - 0 = No ADC, 1 = Link to ADC1, 2= Link to ADC2. This can be set directly.
     """
     enable_line_polarity = 0
     """
-    Enable line polarity - 0 = Enable Line 0 Volts, 1 = Enable Line 5 Volts
+    Enable line polarity - 0 = Enable Line 0 Volts, 1 = Enable Line 5 Volts. This can be set directly.
     """
     pulse_count_change_direction = 0
     """
-    Sets the Pulse count to change direction on the fly - 0000000000-4294967295
+    Sets the Pulse count to change direction on the fly - 0000000000-4294967295. This can be set directly.
     """
     pulse_counts_sent_back = 0
     """
-    Sets the Pulse count at which all Axis pulse counts will be sent back - 0000000000-4294967295
+    Sets the Pulse count at which all Axis pulse counts will be sent back - 0000000000-4294967295. This can be set directly.
     """
     enable_disable_x_pulse_count_replies = 1
     """
-    | Enable/disable X axis pulse count replies
+    | Enable/disable X axis pulse count replies. This can be set directly.
     | 0=Disable X Axis Pulse Replies, 1=Enable X Axis Pulse Reply
     """
     enable_disable_y_pulse_count_replies = 1
     """
-    | Enable/disable Y axis pulse count replies
+    | Enable/disable Y axis pulse count replies. This can be set directly.
     | 0=Disable Y Axis Pulse Replies, 1=Enable Y Axis Pulse Reply
     """
     enable_disable_z_pulse_count_replies = 1
     """
-    | Enable/disable Z axis pulse count replies
+    | Enable/disable Z axis pulse count replies. This can be set directly.
     | 0=Disable Z Axis Pulse Replies, 1=Enable Z Axis Pulse Reply
     """
     enable_disable_e_pulse_count_replies = 1
     """
-    | Enable/disable E axis pulse count replies
+    | Enable/disable E axis pulse count replies. This can be set directly.
     | 0=Disable E Axis Pulse Replies, 1=Enable E Axis Pulse Reply
     """
     pause_all_return_x_pulse_count = 0
     """
-    | Pause all and send back pulse count replies for X axis
+    | Pause all and send back pulse count replies for X axis. This can be set directly.
     | 0=Disable X Axis Pulse Count Replies, 1=Enable X Axis Pulse Count Reply
     """
     pause_all_return_y_pulse_count = 0   # Pause 0=Disable Y Axis Pulse Count Replies, 1=Enable Y Axis Pulse Count Reply
     """
-    | Pause all and send back pulse count replies for Y axis
+    | Pause all and send back pulse count replies for Y axis.This can be set directly.
     | 0=Disable X Axis Pulse Count Replies, 1=Enable X Axis Pulse Count Reply
     """
     pause_all_return_z_pulse_count = 0   # Pause 0=Disable Z Axis Pulse Count Replies, 1=Enable Z Axis Pulse Count Reply
     """
-    | Pause all and send back pulse count replies for Z axis
+    | Pause all and send back pulse count replies for Z axis. This can be set directly.
     | 0=Disable X Axis Pulse Count Replies, 1=Enable X Axis Pulse Count Reply
     """
     pause_all_return_e_pulse_count = 0   # Pause 0=Disable E Axis Pulse Count Replies, 1=Enable E Axis Pulse Count Reply
     """
-    | Pause all and send back pulse count replies for E axis
+    | Pause all and send back pulse count replies for E axis. This can be set directly.
     | 0=Disable X Axis Pulse Count Replies, 1=Enable X Axis Pulse Count Reply
     """
     __paused = False
@@ -1297,7 +1306,7 @@ class Axis(PTHat):
         +----------+------------+------------+--------------+---------------+-----------+-----------+-----------+--------------+--------------+-----------+-----------+-----------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -1345,7 +1354,7 @@ class Axis(PTHat):
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
@@ -1540,7 +1549,7 @@ class Axis(PTHat):
         +----------+------------+------------+--------------+---------------+-----------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -1561,7 +1570,7 @@ class Axis(PTHat):
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
@@ -1624,7 +1633,7 @@ class Axis(PTHat):
         +----------+------------+------------+--------------+-----------+-----------+-----------+-----------+-----------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -1657,11 +1666,11 @@ class Axis(PTHat):
         |              |                          | | 0 = Disable                                                                            |
         |              |                          | | 1 = Enable                                                                             |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
-        | Byte 37      | \*                       | End of Command                                                                           |
+        | Byte 20      | \*                       | End of Command                                                                           |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         The Pulse Count and direction that the motor is travelling will be sent back when pulse target is hit.
@@ -1753,7 +1762,7 @@ class Axis(PTHat):
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -1769,11 +1778,11 @@ class Axis(PTHat):
         |              | | SE = Start E-Axis      |                                                                                          |
         |              | | SA = Start All         |                                                                                          |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
-        | Byte 37      | \*                       | End of Command                                                                           |
+        | Byte 6       | \*                       | End of Command                                                                           |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         In this case the completed command will be sent back when the Axis that has been started completes the Pulse
@@ -1808,7 +1817,7 @@ class Axis(PTHat):
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -1824,11 +1833,11 @@ class Axis(PTHat):
         |              | | SE = Start E-Axis      |                                                                                          |
         |              | | SA = Start All         |                                                                                          |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
-        | Byte 37      | \*                       | End of Command                                                                           |
+        | Byte 6       | \*                       | End of Command                                                                           |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         In this case the completed command will be sent back when the Axis that has been started completes the Pulse
@@ -1883,7 +1892,7 @@ class Axis(PTHat):
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -1899,11 +1908,11 @@ class Axis(PTHat):
         |              | | TE = Stop E-Axis       |                                                                                          |
         |              | | TA = Stop All          |                                                                                          |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
-        | Byte 37      | \*                       | End of Command                                                                           |
+        | Byte 6       | \*                       | End of Command                                                                           |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         In this case the completed command will be sent back when the Axis that has came to a stop.
@@ -1939,7 +1948,7 @@ class Axis(PTHat):
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -1955,11 +1964,11 @@ class Axis(PTHat):
         |              | | TE = Stop E-Axis       |                                                                                          |
         |              | | TA = Stop All          |                                                                                          |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
-        | Byte 37      | \*                       | End of Command                                                                           |
+        | Byte 6       | \*                       | End of Command                                                                           |
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         In this case the completed command will be sent back when the Axis that has came to a stop.
@@ -2021,7 +2030,7 @@ class Axis(PTHat):
         +----------+------------+------------+-----------+-----------+-----------+-----------+-----------+----------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -2060,7 +2069,7 @@ class Axis(PTHat):
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If Pulse Count is selected then it will also send back the pulse count of chosen Axis.
@@ -2121,7 +2130,7 @@ class Axis(PTHat):
         +----------+------------+------------+-----------+-----------+-----------+-----------+-----------+----------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -2160,7 +2169,7 @@ class Axis(PTHat):
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If Pulse Count is selected then it will also send back the pulse count of chosen Axis.
@@ -2268,7 +2277,7 @@ class Axis(PTHat):
         +----------+------------+------------+-----------+-----------+-----------+-----------+-----------+----------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -2307,7 +2316,7 @@ class Axis(PTHat):
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If Pulse Count is selected then it will also send back the pulse count of chosen Axis.
@@ -2354,7 +2363,7 @@ class Axis(PTHat):
         +----------+------------+------------+-----------+-----------+-----------+-----------+-----------+----------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
         | Byte	       | Setting                  | Description                                                                              |
@@ -2393,7 +2402,7 @@ class Axis(PTHat):
         +--------------+--------------------------+------------------------------------------------------------------------------------------+
 
         |
-        **Reply**
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If Pulse Count is selected then it will also send back the pulse count of chosen Axis.
@@ -2471,99 +2480,53 @@ class Axis(PTHat):
         +----------+------------+------------+----------------------------------------------------------------------------------+
         |  Byte 1  |  Byte 2-3  |  Byte 4-5  |  Byte 6                                                                          |
         +==========+============+============+==================================================================================+
-        |     I    |     00     |     TA     |   \*                                                                             |
+        |     I    |     00     |     XP     |   \*                                                                             |
         +----------+------------+------------+----------------------------------------------------------------------------------+
 
         |
-        **Command breakdown**
+        | **Command breakdown**
 
-        +--------------+--------------------------+------------------------------------------------------------------------------------------+
-        | Byte	       | Setting                  | Description                                                                              |
-        +==============+==========================+==========================================================================================+
-        | Byte 1       | I=Instant Command        | Sets command to either Instant or Buffer.                                                |
-        |              | B=Buffer Command         |                                                                                          |
-        +--------------+--------------------------+------------------------------------------------------------------------------------------+
-        | Byte 2-3     | 0-99                     | Optional Command ID                                                                      |
-        +--------------+--------------------------+------------------------------------------------------------------------------------------+
-        | Byte 4-5     | | TX = Stop X-Axis       | Sets which Axis is to be stopped                                                         |
-        |              | | TY = Stop Y-Axis       |                                                                                          |
-        |              | | TZ = Stop Z-Axis       |                                                                                          |
-        |              | | TE = Stop E-Axis       |                                                                                          |
-        |              | | TA = Stop All          |                                                                                          |
-        +--------------+--------------------------+------------------------------------------------------------------------------------------+
-        | Byte 37      | \*                       | End of Command                                                                           |
-        +--------------+--------------------------+------------------------------------------------------------------------------------------+
+        +--------------+----------------------------+----------------------------------------------------------------------------------------+
+        | Byte	       | Setting                    | Description                                                                            |
+        +==============+============================+========================================================================================+
+        | Byte 1       | I=Instant Command          | Sets command to either Instant or Buffer.                                              |
+        |              | B=Buffer Command           |                                                                                        |
+        +--------------+----------------------------+----------------------------------------------------------------------------------------+
+        | Byte 2-3     | 0-99                       | Optional Command ID                                                                    |
+        +--------------+----------------------------+----------------------------------------------------------------------------------------+
+        | Byte 4-5     | | XP = Pulse Count X-Axis  | Request current pulse count for Axis specified                                         |
+        |              | | YP = Pulse Count Y-Axis  |                                                                                        |
+        |              | | ZP = Pulse Count Z-Axis  |                                                                                        |
+        |              | | EP = Pulse Count E-Axis  |                                                                                        |
+        +--------------+----------------------------+----------------------------------------------------------------------------------------+
+        | Byte 6       | \*                         | End of Command                                                                         |
+        +--------------+----------------------------+----------------------------------------------------------------------------------------+
 
         |
-        **Reply**
-
-        The PTHAT will send back a reply when it receives a command and also when it has completed a command.
-        In this case the completed command will be sent back when the Axis that has came to a stop.
-        If the Command sent ID number was set for bytes 2-3, then this will be returned in the Received reply, but the
-        completed command ID will be from the original ID used in the Start command.
-
-        +------------------+------------------+------------------+------------------+------------------+---------------------------------------------+
-        | | X Pause        | | Y Pause        | | Z Pause        | | E Pause        | | Pause All      |                                             |
-        | | Received       | | Received       | | Received       | | Received       | | Received       |                                             |
-        +==================+==================+==================+==================+==================+=============================================+
-        |   RI00PX*        |   RI00PY*        |   RI00PZ*        |   RI00PE*        |   RI00PA*        |                                             |
-        +------------------+------------------+------------------+------------------+------------------+---------------------------------------------+
-        | | DI00PX*        | | DI00PY*        | | DI00PZ*        | | DI00PE*        | | DI00PX to E*   |                                             |
-        | | XP(D)XResult*  | | XP(D)XResult*  | | XP(D)XResult*  | | XP(D)XResult*  | | XP(D)XResult*  |                                             |
-        | | YP(D)XResult*  | | YP(D)XResult*  | | YP(D)XResult*  | | YP(D)XResult*  | | YP(D)XResult*  |                                             |
-        | | ZP(D)XResult*  | | ZP(D)XResult*  | | ZP(D)XResult*  | | ZP(D)XResult*  | | ZP(D)XResult*  |                                             |
-        | | EP(D)XResult*  | | EP(D)XResult*  | | EP(D)XResult*  | | EP(D)XResult*  | | EP(D)XResult*  |                                             |
-        | |                | |                | |                | |                |                  |                                             |
-        | | (D)=Direction  | | (D)=Direction  | | (D)=Direction  | | (D)=Direction  | | (D)=Direction  |                                             |
-        | | of motor       | | of motor       | | of motor       | | of motor       | | of motor       |                                             |
-        | | travel         | | travel         | | travel         | | travel         | | travel         |                                             |
-        | |                | |                | |                | |                | |                |                                             |
-        | | Result=        | | Result=        | | Result=        | | Result=        | | Result=        |                                             |
-        | | 0000000000-    | | 0000000000-    | | 0000000000-    | | 0000000000-    | | 0000000000-    |                                             |
-        | | 4294967295     | | 4294967295     | | 4294967295     | | 4294967295     | | 4294967295     |                                             |
-        +------------------+------------------+------------------+------------------+------------------+---------------------------------------------+
-
-
-
-
-        Command:
-
-        Byte1	Byte 2-3	Byte 4-5	Byte 6
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        XP	        *
-
-        Command breakdown:
-
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5	XP = Pulse Count X-Axis Request current pulse count for Axis specified
-                    YP = Pulse Count X-Axis
-                    ZP = Pulse Count X-Axis
-                    EP = Pulse Count X-Axis
-        Byte 6	    *	                    End of Command
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         In this case the received command will be sent back along with the Pulse Count and direction that the motor is
         travelling, then completed command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
 
-        X Pulse Count       Y Pulse Count       Z Pulse Count       E Pulse Count       X Pulse     Y Pulse     Z Pulse     E Pulse
-        Received            Received            Received            Received            Count       Count       Count       Count
-        *Result*            *Result*            *Result*            *Result*            Completed   Completed   Completed   Completed
-        ------------------------------------------------------------------------------------------------------------------------------
-        RI00XP*	            RI00YP*	            RI00ZP*	            RI00EP*	            CI00XP*	    CI00YP*	    CI00ZP*	    CI00EP*
-
-        XP(D)XResult	    YP(D)YResult	    ZP(D)ZResult	    EP(D)EResult
-
-        (D)=Direction of    (D)=Direction of    (D)=Direction of    (D)=Direction of
-        X motor travel      Y motor travel      Z motor travel      E motor travel
-
-        XResult=            XResult=            XResult=            XResult=
-        0000000000-         0000000000-         0000000000-         0000000000-
-        4294967295          4294967295          4294967295          4294967295
+        +------------------+------------------+------------------+------------------+------------------+------------------+------------------+------------------+
+        | | X Pulse Count  | | Y Pulse Count  | | Z Pulse Count  | | E Pulse Count  | | X Pulse        | | X Pulse        | | X Pulse        | | X Pulse        |
+        | | Received       | | Received       | | Received       | | Received       | | Count          | | Count          | | Count          | | Count          |
+        | | *Result*       | | *Result*       | | *Result*       | | *Result*       | | Completed      | | Completed      | | Completed      | | Completed      |
+        +==================+==================+==================+==================+==================+==================+==================+==================+
+        |   RI00XP*        |   RI00YP*        |   RI00ZP*        |   RI00EP*        |   CI00XP*        |   CI00YP*        |   CI00ZP*        |   CI00EP*        |
+        +------------------+------------------+------------------+------------------+------------------+------------------+------------------+------------------+
+        | | XP(D)XResult   | | YP(D)XResult   | | ZP(D)XResult   | | EP(D)XResult   |                                                                           |
+        | |                | |                | |                | |                |                                                                           |
+        | | (D)=Direction  | | (D)=Direction  | | (D)=Direction  | | (D)=Direction  |                                                                           |
+        | | of X motor     | | of Y motor     | | of Z motor     | | of E motor     |                                                                           |
+        | | travel         | | travel         | | travel         | | travel         |                                                                           |
+        | |                | |                | |                | |                |                                                                           |
+        | | XResult=       | | XResult=       | | XResult=       | | XResult=       |                                                                           |
+        | | 0000000000-    | | 0000000000-    | | 0000000000-    | | 0000000000-    |                                                                           |
+        | | 4294967295     | | 4294967295     | | 4294967295     | | 4294967295     |                                                                           |
+        +------------------+------------------+------------------+------------------+------------------+--------------------------------------------------------+
         """
         if not self._validate_command():
             return False
@@ -2587,34 +2550,48 @@ class Axis(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6-15	Byte 16
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        QX	        001000.000	*
+        +----------+------------+------------+----------------------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |   Byte 6-15  |  Byte 16                                                          |
+        +==========+============+============+==================================================================================+
+        |     I    |     00     |     QX     |  001000.000  |   \*                                                              |
+        +----------+------------+------------+----------------------------------------------------------------------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5	QX = Set X-Axis         Sets which Axis is to be set
-                    QY = Set Y-Axis
-                    QZ = Set Z-Axis
-                    QE = Set E-Axis
-        Byte 6-15	000000.000-125000.000	Sets the frequency of the pulse train
-        Byte 16	    *	                    End of Command
+        +--------------+--------------------------+------------------------------------------------------------------------------------------+
+        | Byte	       | Setting                  | Description                                                                              |
+        +==============+==========================+==========================================================================================+
+        | Byte 1       | I=Instant Command        | Sets command to either Instant or Buffer.                                                |
+        |              | B=Buffer Command         |                                                                                          |
+        +--------------+--------------------------+------------------------------------------------------------------------------------------+
+        | Byte 2-3     | 0-99                     | Optional Command ID                                                                      |
+        +--------------+--------------------------+------------------------------------------------------------------------------------------+
+        | Byte 4-5     | | QX = Set X-Axis        | Sets which Axis is to be set                                                             |
+        |              | | QY = Set Y-Axis        |                                                                                          |
+        |              | | QZ = Set Z-Axis        |                                                                                          |
+        |              | | QE = Set E-Axis        |                                                                                          |
+        +--------------+--------------------------+------------------------------------------------------------------------------------------+
+        | Byte 6-15    | 000000.000-125000.000    | Sets the new frequency of the pulse train                                                |
+        +--------------+--------------------------+------------------------------------------------------------------------------------------+
+        | Byte 16      | \*                       | End of Command                                                                           |
+        +--------------+--------------------------+------------------------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
         These can be turned off if needed.
 
-        X set       Y set       Z set       E set       X set       Y set       Z set       E set
-        Received	Received	Received	Received	Completed	Completed	Completed	Completed
-        ---------------------------------------------------------------------------------------------------------------
-        RI00QX*	    RI00QY*	    RI00QZ*	    RI00QE*	    CI00QX*	    CI00QY*	    CI00QZ*	    CI00QE*
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+
+        | | X Set      | | Y Set      | | Z Set      | | E Set      | | X Set       | | Y Set       | | Z Set       | | E Set       |
+        | | Received   | | Received   | | Received   | | Received   | | Completed   | | Completed   | | Completed   | | Completed   |
+        +==============+==============+==============+==============+===============+===============+===============+===============+
+        |   RI00QX*    |   RI00QY*    |   RI00QZ*    |   RI00QE*    |   CI00QX*     |   CI00QY*     |  CI00QZ*      |   CI00QE*     |
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+
         """
         self.frequency = new_frequency
 
@@ -2641,36 +2618,50 @@ class Axis(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        KX	        1	    *
+        +----------+------------+------------+----------------------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |   Byte 6  |  Byte 7                                                              |
+        +==========+============+============+==================================================================================+
+        |     I    |     00     |     KX     |      1    |   \*                                                                 |
+        +----------+------------+------------+----------------------------------------------------------------------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5	KX = Set Limit Switch X Set Limit Switch or Emergency Stop Enable/Disable
-                    KY = Set Limit Switch Y
-                    KZ = Set Limit Switch Z
-                    KE = Set Limit Switch E
-                    KS = Set Emergency Stop
-        Byte 6	    0=Disable               Switches selected Limit Switch to Enable/Disable
-                    1=Enable
-        Byte 7	    *	                    End of Command
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte	       | Setting                    | Description                                                                              |
+        +==============+============================+==========================================================================================+
+        | Byte 1       | I=Instant Command          | Sets command to either Instant or Buffer.                                                |
+        |              | B=Buffer Command           |                                                                                          |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 2-3     | 0-99                       | Optional Command ID                                                                      |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 4-5     | | KX = Set Limit Switch X  | Set Limit Switch or Emergency Stop Enable/Disable                                        |
+        |              | | KY = Set Limit Switch Y  |                                                                                          |
+        |              | | KZ = Set Limit Switch Z  |                                                                                          |
+        |              | | KE = Set Limit Switch E  |                                                                                          |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 6       | 0-1                        | | Switches selected Limit Switch to Enable/Disable                                       |
+        |              |                            | | 0=Disable                                                                              |
+        |              |                            | | 1=Enable                                                                               |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 7       | \*                         | End of Command                                                                           |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
 
-        X Limit     Y Limit     Z Limit     E Limit     Emergency       X Limit     Y Limit     Z Limit     E Limit     Emergency
-        Received    Received    Received    Received    Stop            Completed   Completed   Completed   Completed   Stop
-                                                        Received                                                        Completed
-        ---------------------------------------------------------------------------------------------------------------------------
-        R00KX*	    R00KY*	    R00KZ*	    R00KE*	    R00KS*	        C00KX*	    C00KY*	    C00KZ*	    C00KE*	    C00KS*
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+
+        | | X Limit    | | Y Limit    | | Z Limit    | | E Limit    | | Emergency   | | X Limit     | | Y Limit     | | Z Limit     | | E Limit     | | Emergency   |
+        | | Received   | | Received   | | Received   | | Received   | | Stop        | | Completed   | | Completed   | | Completed   | | Completed   | | Stop        |
+        |              |              |              |              | | Received    |               |               |               |               | | Completed   |
+        +==============+==============+==============+==============+===============+===============+===============+===============+===============+===============+
+        |   R00KX*     |   R00KY*     |   R00KZ*     |   R00KE*     |   R00KS*      |   C00KX*      |  C00KY*       |   C00KZ*      |   C00KE*      |   C00KS*      |
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+
         """
         if not self._validate_command():
             return False
@@ -2691,36 +2682,50 @@ class Axis(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        KX	        0	    *
+        +----------+------------+------------+----------------------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |   Byte 6  |  Byte 7                                                              |
+        +==========+============+============+==================================================================================+
+        |     I    |     00     |     KX     |      0    |   \*                                                                 |
+        +----------+------------+------------+----------------------------------------------------------------------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5	KX = Set Limit Switch X Set Limit Switch or Emergency Stop Enable/Disable
-                    KY = Set Limit Switch Y
-                    KZ = Set Limit Switch Z
-                    KE = Set Limit Switch E
-                    KS = Set Emergency Stop
-        Byte 6	    0=Disable               Switches selected Limit Switch to Enable/Disable
-                    1=Enable
-        Byte 7	    *	                    End of Command
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte	       | Setting                    | Description                                                                              |
+        +==============+============================+==========================================================================================+
+        | Byte 1       | I=Instant Command          | Sets command to either Instant or Buffer.                                                |
+        |              | B=Buffer Command           |                                                                                          |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 2-3     | 0-99                       | Optional Command ID                                                                      |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 4-5     | | KX = Set Limit Switch X  | Set Limit Switch or Emergency Stop Enable/Disable                                        |
+        |              | | KY = Set Limit Switch Y  |                                                                                          |
+        |              | | KZ = Set Limit Switch Z  |                                                                                          |
+        |              | | KE = Set Limit Switch E  |                                                                                          |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 6       | 0-1                        | | Switches selected Limit Switch to Enable/Disable                                       |
+        |              |                            | | 0=Disable                                                                              |
+        |              |                            | | 1=Enable                                                                               |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 7       | \*                         | End of Command                                                                           |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
 
-        X Limit     Y Limit     Z Limit     E Limit     Emergency       X Limit     Y Limit     Z Limit     E Limit     Emergency
-        Received    Received    Received    Received    Stop            Completed   Completed   Completed   Completed   Stop
-                                                        Received                                                        Completed
-        ---------------------------------------------------------------------------------------------------------------------------
-        R00KX*	    R00KY*	    R00KZ*	    R00KE*	    R00KS*	        C00KX*	    C00KY*	    C00KZ*	    C00KE*	    C00KS*
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+
+        | | X Limit    | | Y Limit    | | Z Limit    | | E Limit    | | Emergency   | | X Limit     | | Y Limit     | | Z Limit     | | E Limit     | | Emergency   |
+        | | Received   | | Received   | | Received   | | Received   | | Stop        | | Completed   | | Completed   | | Completed   | | Completed   | | Stop        |
+        |              |              |              |              | | Received    |               |               |               |               | | Completed   |
+        +==============+==============+==============+==============+===============+===============+===============+===============+===============+===============+
+        |   R00KX*     |   R00KY*     |   R00KZ*     |   R00KE*     |   R00KS*      |   C00KX*      |  C00KY*       |   C00KZ*      |   C00KE*      |   C00KS*      |
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+
         """
         if not self._validate_command():
             return False
@@ -2741,36 +2746,50 @@ class Axis(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        KS	        1	    *
+        +----------+------------+------------+----------------------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |   Byte 6  |  Byte 7                                                              |
+        +==========+============+============+==================================================================================+
+        |     I    |     00     |     KS     |      1    |   \*                                                                 |
+        +----------+------------+------------+----------------------------------------------------------------------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5	KX = Set Limit Switch X Set Limit Switch or Emergency Stop Enable/Disable
-                    KY = Set Limit Switch Y
-                    KZ = Set Limit Switch Z
-                    KE = Set Limit Switch E
-                    KS = Set Emergency Stop
-        Byte 6	    0=Disable               Switches selected Limit Switch to Enable/Disable
-                    1=Enable
-        Byte 7	    *	                    End of Command
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte	       | Setting                    | Description                                                                              |
+        +==============+============================+==========================================================================================+
+        | Byte 1       | I=Instant Command          | Sets command to either Instant or Buffer.                                                |
+        |              | B=Buffer Command           |                                                                                          |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 2-3     | 0-99                       | Optional Command ID                                                                      |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 4-5     | | KX = Set Limit Switch X  | Set Limit Switch or Emergency Stop Enable/Disable                                        |
+        |              | | KY = Set Limit Switch Y  |                                                                                          |
+        |              | | KZ = Set Limit Switch Z  |                                                                                          |
+        |              | | KE = Set Limit Switch E  |                                                                                          |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 6       | 0-1                        | | Switches selected Limit Switch to Enable/Disable                                       |
+        |              |                            | | 0=Disable                                                                              |
+        |              |                            | | 1=Enable                                                                               |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 7       | \*                         | End of Command                                                                           |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
 
-        X Limit     Y Limit     Z Limit     E Limit     Emergency       X Limit     Y Limit     Z Limit     E Limit     Emergency
-        Received    Received    Received    Received    Stop            Completed   Completed   Completed   Completed   Stop
-                                                        Received                                                        Completed
-        ---------------------------------------------------------------------------------------------------------------------------
-        R00KX*	    R00KY*	    R00KZ*	    R00KE*	    R00KS*	        C00KX*	    C00KY*	    C00KZ*	    C00KE*	    C00KS*
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+
+        | | X Limit    | | Y Limit    | | Z Limit    | | E Limit    | | Emergency   | | X Limit     | | Y Limit     | | Z Limit     | | E Limit     | | Emergency   |
+        | | Received   | | Received   | | Received   | | Received   | | Stop        | | Completed   | | Completed   | | Completed   | | Completed   | | Stop        |
+        |              |              |              |              | | Received    |               |               |               |               | | Completed   |
+        +==============+==============+==============+==============+===============+===============+===============+===============+===============+===============+
+        |   R00KX*     |   R00KY*     |   R00KZ*     |   R00KE*     |   R00KS*      |   C00KX*      |  C00KY*       |   C00KZ*      |   C00KE*      |   C00KS*      |
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+
         """
         if not self._validate_command():
             return False
@@ -2791,36 +2810,50 @@ class Axis(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        KX	        1	    *
+        +----------+------------+------------+----------------------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |   Byte 6  |  Byte 7                                                              |
+        +==========+============+============+==================================================================================+
+        |     I    |     00     |     KS     |      0    |   \*                                                                 |
+        +----------+------------+------------+----------------------------------------------------------------------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5	KX = Set Limit Switch X Set Limit Switch or Emergency Stop Enable/Disable
-                    KY = Set Limit Switch Y
-                    KZ = Set Limit Switch Z
-                    KE = Set Limit Switch E
-                    KS = Set Emergency Stop
-        Byte 6	    0=Disable               Switches selected Limit Switch to Enable/Disable
-                    1=Enable
-        Byte 7	    *	                    End of Command
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte	       | Setting                    | Description                                                                              |
+        +==============+============================+==========================================================================================+
+        | Byte 1       | I=Instant Command          | Sets command to either Instant or Buffer.                                                |
+        |              | B=Buffer Command           |                                                                                          |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 2-3     | 0-99                       | Optional Command ID                                                                      |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 4-5     | | KX = Set Limit Switch X  | Set Limit Switch or Emergency Stop Enable/Disable                                        |
+        |              | | KY = Set Limit Switch Y  |                                                                                          |
+        |              | | KZ = Set Limit Switch Z  |                                                                                          |
+        |              | | KE = Set Limit Switch E  |                                                                                          |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 6       | 0-1                        | | Switches selected Limit Switch to Enable/Disable                                       |
+        |              |                            | | 0=Disable                                                                              |
+        |              |                            | | 1=Enable                                                                               |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+        | Byte 7       | \*                         | End of Command                                                                           |
+        +--------------+----------------------------+------------------------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
 
-        X Limit     Y Limit     Z Limit     E Limit     Emergency       X Limit     Y Limit     Z Limit     E Limit     Emergency
-        Received    Received    Received    Received    Stop            Completed   Completed   Completed   Completed   Stop
-                                                        Received                                                        Completed
-        ---------------------------------------------------------------------------------------------------------------------------
-        R00KX*	    R00KY*	    R00KZ*	    R00KE*	    R00KS*	        C00KX*	    C00KY*	    C00KZ*	    C00KE*	    C00KS*
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+
+        | | X Limit    | | Y Limit    | | Z Limit    | | E Limit    | | Emergency   | | X Limit     | | Y Limit     | | Z Limit     | | E Limit     | | Emergency   |
+        | | Received   | | Received   | | Received   | | Received   | | Stop        | | Completed   | | Completed   | | Completed   | | Completed   | | Stop        |
+        |              |              |              |              | | Received    |               |               |               |               | | Completed   |
+        +==============+==============+==============+==============+===============+===============+===============+===============+===============+===============+
+        |   R00KX*     |   R00KY*     |   R00KZ*     |   R00KE*     |   R00KS*      |   C00KX*      |  C00KY*       |   C00KZ*      |   C00KE*      |   C00KS*      |
+        +--------------+--------------+--------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+
         """
         if not self._validate_command():
             return False
@@ -2880,9 +2913,19 @@ class ADC(PTHat):
 
     This is an ADC class containing info about an ADC. It inherits from PTHat so contains all functionality
     needed to communicate with the PTHat via the serial interface.
+
+    :param adc_number: ADC number, 1 or 2
+    :param command_type: type of command, I = instant, B = buffered - default I
+    :param command_id: optional command ID, 0-99 - default 0
+    :param serial_device: serial device - default /dev/ttyS0
+    :param baud_rate: serial port baud rate - default 115200
+    :param test_mode: if true then serial commands will not actually be sent - default False
     """
     # Properties
-    adc_number = 1  # ADC number - Currently 1 or 2
+    adc_number = 1
+    """
+    ADC number - Currently 1 or 2. This can be set directly.
+    """
 
     # ADC commands
     __request_adc_reading_command = "D"  # Request current ADC value - D1 = ADC1 Result, D2 = ADC2 Result
@@ -2891,13 +2934,6 @@ class ADC(PTHat):
                  test_mode=False):
         """
         Constructor
-
-        :param adc_number: ADC number, 1 or 2
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
-        :param serial_device: serial device - default /dev/ttyS0
-        :param baud_rate: serial port baud rate - default 115200
-        :param test_mode: if true then serial commands will not actually be sent - default False
         """
         super().__init__(command_type=command_type, command_id=command_id, serial_device=serial_device,
                          baud_rate=baud_rate, test_mode=test_mode)
@@ -2916,31 +2952,44 @@ class ADC(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        D1	        *
+        +----------+------------+------------+----------------------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |  Byte 6                                                                          |
+        +==========+============+============+==================================================================================+
+        |     I    |     00     |     D1     |   \*                                                                             |
+        +----------+------------+------------+----------------------------------------------------------------------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5	D1= ADC1 Result         Request current ADC value
-                    D2= ADC2 Result
-        Byte 6	    *	                    End of Command
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte	   | Setting	          | Description                                                               |
+        +==========+======================+===========================================================================+
+        | Byte 1   | I=Instant Command    | Sets command to either Instant or Buffer.                                 |
+        |          | B=Buffer Command     |                                                                           |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 2-3 | 0-99                 | Optional Command ID                                                       |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 4-5 | | D1 = ADC1 Result   | Request current ADC value                                                 |
+        |          | | D2 = ADC2 Result   |                                                                           |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 6   | \*                   | End of Command                                                            |
+        +----------+----------------------+---------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         In this case the received command will be sent back along with the ADC result and then completed command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
 
-        ADC1 Received       ADC2 Received       ADC1            ADC2
-        *Result*	        *Result*            Completed       Completed
-        ---------------------------------------------------------------------------------------------------------------
-        RI00D1**Result*	    RI00D2**Result*	    CI00D1*	        CI00D2*
+        +-----------------------+-----------------------+-----------------+---------------+---------------------------------------------------------------------+
+        | | ADC1 Received       | | ADC1 Received       | | ADC1          | | ADC2        |                                                                     |
+        | | \*Result\*          | | \*Result\*          | | Completed     | | Completed   |                                                                     |
+        +=======================+===========+===========+=================+===============+=====================================================================+
+        |  RI00D1**Result*      |  RI00D2**Result*      |      CI00D1*    |    CI00D2*    |                                                                     |
+        +-----------------------+-----------------------+-----------------+---------------+---------------------------------------------------------------------+
         """
         if not self._validate_command():
             return False
@@ -2975,9 +3024,19 @@ class AUX(PTHat):
 
     This is an AUC class containing info about an AUX. It inherits from PTHat so contains all functionality
     needed to communicate with the PTHat via the serial interface.
+
+    :param aux_number: AUX number, 1-3
+    :param command_type: type of command, I = instant, B = buffered - default I
+    :param command_id: optional command ID, 0-99 - default 0
+    :param serial_device: serial device - default /dev/ttyS0
+    :param baud_rate: serial port baud rate - default 115200
+    :param test_mode: if true then serial commands will not actually be sent - default False
     """
     # Properties
-    aux_number = 1  # ADC number, currently 1, 2 or 3
+    aux_number = 1
+    """
+    ADC number, currently 1, 2 or 3. This can be set directly.
+    """
 
     # AUX commands
     __set_on_off_aux_output_command = "A"  # Set on/off AUX output command - A1 = Set AUX1, A2 = Set AUX2, A3 = Set AUX3
@@ -2986,13 +3045,6 @@ class AUX(PTHat):
                  test_mode=False):
         """
         Constructor
-
-        :param aux_number: AUX number, 1-3
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
-        :param serial_device: serial device - default /dev/ttyS0
-        :param baud_rate: serial port baud rate - default 115200
-        :param test_mode: if true then serial commands will not actually be sent - default False
         """
         super().__init__(command_type=command_type, command_id=command_id, serial_device=serial_device,
                          baud_rate=baud_rate, test_mode=test_mode)
@@ -3011,32 +3063,47 @@ class AUX(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        A1	        1	    *
+        +----------+------------+------------+----------------------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |  Byte 6   |  Byte 7                                                              |
+        +==========+============+============+==================================================================================+
+        |     I    |     00     |     A1     |     1     |    \*                                                                |
+        +----------+------------+------------+----------------------------------------------------------------------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5    A1 = Set Aux1           Set Aux port for switching
-                    A2 = Set Aux2
-                    A3 = Set Aux3
-        Byte 6	    0=Off                   Switches selected Aux On or Off
-                    1=On
-        Byte 7	    *	                    End of Command
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte	   | Setting	          | Description                                                               |
+        +==========+======================+===========================================================================+
+        | Byte 1   | I=Instant Command    | Sets command to either Instant or Buffer.                                 |
+        |          | B=Buffer Command     |                                                                           |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 2-3 | 0-99                 | Optional Command ID                                                       |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 4-5 | A1 = Set Aux1        | Set Aux port for switching                                                |
+        |          | A2 = Set Aux2        |                                                                           |
+        |          | A3 = Set Aux3        |                                                                           |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 6   | 0-1                  | | Switches selected Aux On or Off                                         |
+        |          |                      | | 0 = Off                                                                 |
+        |          |                      | | 1 = On                                                                  |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 7   | \*                   | End of Command                                                            |
+        +----------+----------------------+---------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
 
-        Aux1 Received   Aux2 Received	Aux3 Received	Aux1 Completed	Aux2 Completed	Aux3 Completed
-        ---------------------------------------------------------------------------------------------------------------
-        R00A1*	        R00A2*	        R00A3*	        C00A1*	        C00A2*	        C00A3*
+        +------------------+------------------+------------------+-------------------+-------------------+-------------------+----------------------------------+
+        |  Aux1 Received   |  Aux2 Received   |  Aux3 Received   |  Aux3 Completed   |  Aux3 Completed   |  Aux3 Completed   |                                  |
+        +==================+==================+==================+===================+===================+===================+==================================+
+        |      R00A1*      |      R00A2*      |      R00A3*      |     C00A1*        |     C00A1*        |      C00A1*       |                                  |
+        +------------------+------------------+------------------+-------------------+-------------------+-------------------+----------------------------------+
         """
         if not self._validate_command():
             return False
@@ -3063,32 +3130,47 @@ class AUX(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6	Byte 7
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        A1	        0	    *
+        +----------+------------+------------+----------------------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |  Byte 6   |  Byte 7                                                              |
+        +==========+============+============+==================================================================================+
+        |     I    |     00     |     A1     |     0     |    \*                                                                |
+        +----------+------------+------------+----------------------------------------------------------------------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5    A1 = Set Aux1           Set Aux port for switching
-                    A2 = Set Aux2
-                    A3 = Set Aux3
-        Byte 6	    0=Off                   Switches selected Aux On or Off
-                    1=On
-        Byte 7	    *	                    End of Command
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte	   | Setting	          | Description                                                               |
+        +==========+======================+===========================================================================+
+        | Byte 1   | I=Instant Command    | Sets command to either Instant or Buffer.                                 |
+        |          | B=Buffer Command     |                                                                           |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 2-3 | 0-99                 | Optional Command ID                                                       |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 4-5 | A1 = Set Aux1        | Set Aux port for switching                                                |
+        |          | A2 = Set Aux2        |                                                                           |
+        |          | A3 = Set Aux3        |                                                                           |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 6   | 0-1                  | | Switches selected Aux On or Off                                         |
+        |          |                      | | 0 = Off                                                                 |
+        |          |                      | | 1 = On                                                                  |
+        +----------+----------------------+---------------------------------------------------------------------------+
+        | Byte 7   | \*                   | End of Command                                                            |
+        +----------+----------------------+---------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
 
-        Aux1 Received   Aux2 Received	Aux3 Received	Aux1 Completed	Aux2 Completed	Aux3 Completed
-        ---------------------------------------------------------------------------------------------------------------
-        R00A1*	        R00A2*	        R00A3*	        C00A1*	        C00A2*	        C00A3*
+        +------------------+------------------+------------------+-------------------+-------------------+-------------------+----------------------------------+
+        |  Aux1 Received   |  Aux2 Received   |  Aux3 Received   |  Aux3 Completed   |  Aux3 Completed   |  Aux3 Completed   |                                  |
+        +==================+==================+==================+===================+===================+===================+==================================+
+        |      R00A1*      |      R00A2*      |      R00A3*      |     C00A1*        |     C00A1*        |      C00A1*       |                                  |
+        +------------------+------------------+------------------+-------------------+-------------------+-------------------+----------------------------------+
         """
         if not self._validate_command():
             return False
@@ -3125,17 +3207,48 @@ class PWM(PTHat):
 
     From Firmware V5.3 onwards there are commands for controlling two dedicated PWM channels. Details for PWM can be
     found here: http://pthat.com/index.php/pwm/
+
+    :param axis: axis for this class
+    :param command_type: type of command, I = instant, B = buffered - default I
+    :param command_id: optional command ID, 0-99 - default 0
+    :param serial_device: serial device - default /dev/ttyS0
+    :param baud_rate: serial port baud rate - default 115200
+    :param test_mode: if true then serial commands will not actually be sent - default False
     """
     # Properties
-    axis = "X"  # Sets which Axis is to be set - X or Y, if UA then this doesn't matter as it will do both X and Y
-    frequency = 0  # Frequency for the channel is in 1Hz steps - 0000000-1000000
-    duty_cycle = 0   # Sets the Duty Cycle 0-100%, The last 2 digits are decimal places. So 08050 would be 80.5%
+    axis = "X"
+    """
+    Sets which Axis is to be set - X or Y, if UA then this doesn't matter as it will do both X and Y. This can be set directly.
+    """
+    frequency = 0
+    """
+    Frequency for the channel is in 1Hz steps - 0000000-1000000. This can be set directly.
+    """
+    duty_cycle = 0
+    """
+    Sets the Duty Cycle 0-100%, The last 2 digits are decimal places. So 08050 would be 80.5%. This can be set directly.
+    """
 
-    # Used for Set Both PWM Channels Command only
-    frequency_x = 0  # Sets the Frequency for the channel in 1Hz steps for X-Axis
-    frequency_y = 0  # Sets the Frequency for the channel in 1Hz steps for Y-Axis
-    duty_cycle_x = 0   # Sets the Duty Cycle 0-100% for X-Axis
-    duty_cycle_y = 0   # Sets the Duty Cycle 0-100% for Y-Axis
+    frequency_x = 0
+    """
+    | Used for Set Both PWM Channels Command only
+    | Sets the Frequency for the channel in 1Hz steps for X-Axis. This can be set directly.
+    """
+    frequency_y = 0
+    """
+    | Used for Set Both PWM Channels Command only
+    | Sets the Frequency for the channel in 1Hz steps for Y-Axis. This can be set directly.
+    """
+    duty_cycle_x = 0
+    """
+    | Used for Set Both PWM Channels Command only
+    | Sets the Duty Cycle 0-100% for X-Axis. This can be set directly.
+    """
+    duty_cycle_y = 0
+    """
+    | Used for Set Both PWM Channels Command only
+    | Sets the Duty Cycle 0-100% for Y-Axis. This can be set directly.
+    """
 
     # PWM commands
     __set_pwm_channel_command = "U"  # Sets the PWM channel - UX= Set X-Axis, UY= Set Y-Axis
@@ -3145,13 +3258,6 @@ class PWM(PTHat):
                  test_mode=False):
         """
         Constructor
-
-        :param axis: axis for this class
-        :param command_type: type of command, I = instant, B = buffered - default I
-        :param command_id: optional command ID, 0-99 - default 0
-        :param serial_device: serial device - default /dev/ttyS0
-        :param baud_rate: serial port baud rate - default 115200
-        :param test_mode: if true then serial commands will not actually be sent - default False
         """
         super().__init__(command_type=command_type, command_id=command_id, serial_device=serial_device,
                          baud_rate=baud_rate, test_mode=test_mode)
@@ -3172,34 +3278,48 @@ class PWM(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6-12	Byte 13-17	Byte 18
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        UX	        0000000	    00000	    *
+        +----------+------------+------------+----------------------------------------------------------------------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |  Byte 6-12  |  Byte 13-17  |  Byte 18  |                                         |
+        +==========+============+============+==================================================================================+
+        |     I    |     00     |     UX     |   0000000   |    00000     |     \*    |                                         |
+        +----------+------------+------------+----------------------------------------------------------------------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command       Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                Optional Command ID
-        Byte 4-5	UX= Set X-Axis          Sets which Axis is to be set
-                    UY= Set Y-Axis
-        Byte 6-12	0000000-1000000	        Sets the Frequency for the channel in 1Hz steps
-        Byte 14-17	00000	                Sets the Duty Cycle 0-100%
-                                            The last 2 digits are decimal places. So 08050 would be 80.5%
-        Byte 18	    *	                    End of Command
+        +------------+----------------------+---------------------------------------------------------------------------+
+        | Byte	     | Setting	            | Description                                                               |
+        +============+======================+===========================================================================+
+        | Byte 1     | I=Instant Command    | Sets command to either Instant or Buffer.                                 |
+        |            | B=Buffer Command     |                                                                           |
+        +------------+----------------------+---------------------------------------------------------------------------+
+        | Byte 2-3   | 0-99                 | Optional Command ID                                                       |
+        +------------+----------------------+---------------------------------------------------------------------------+
+        | Byte 4-5   | UX = Set X-Axis      | Sets which Axis is to be set                                              |
+        |            | UY = Set Y-Axis      |                                                                           |
+        +------------+----------------------+---------------------------------------------------------------------------+
+        | Byte 6-12  | 0000000-1000000      | Sets the Frequency for the channel in 1Hz steps                           |
+        +------------+----------------------+---------------------------------------------------------------------------+
+        | Byte 13-17 | 00000                | Sets the Duty Cycle 0-100%                                                |
+        +------------+----------------------+---------------------------------------------------------------------------+
+        | Byte 18    | \*                   | End of Command                                                            |
+        +------------+----------------------+---------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
         These can be turned off if needed.
 
-        X set       Y set       X set       Y set
-        Received	Received	Completed   Completed
-        ---------------------------------------------------------------------------------------------------------------
-        RI00UX*	    RI00UY*	    CI00UX*	    CI00UY*
+        +--------------+--------------+--------------+--------------+-------------------------------------------------------------------------------------------+
+        | | X Set      | | X Set      | | X Set      | | X Set      |                                                                                           |
+        | | Received   | | Received   | | Received   | | Received   |                                                                                           |
+        +==============+==============+==============+==============+===========================================================================================+
+        |    RI00UX*   |    RI00UY*   |    CI00UX*   |    CI00UY*   |                                                                                           |
+        +--------------+--------------+--------------+--------------+-------------------------------------------------------------------------------------------+
         """
         if not self._validate_command():
             return False
@@ -3267,36 +3387,51 @@ class PWM(PTHat):
         :returns: the command to send to the serial port
         :rtype: str
 
-        Command:
+        **Command**
 
-        Byte1	Byte 2-3	Byte 4-5	Byte 6-12	Byte 13-17	Byte 18-24	Byte 25-29	Byte 30
-        ---------------------------------------------------------------------------------------------------------------
-        I	    00	        UX	        0000000	    00000	    0000000	    00000	    *
+        +----------+------------+------------+-------------+--------------+--------------+--------------+-----------------------+
+        |  Byte 1  |  Byte 2-3  |  Byte 4-5  |  Byte 6-12  |  Byte 13-17  |  Byte 18-24  |  Byte 25-29  |  Byte 30              |
+        +==========+============+============+=============+==============+==============+==============+=======================+
+        |     I    |     00     |     UA     |   0000000   |    00000     |   0000000    |    00000     |     \*                |
+        +----------+------------+------------+-------------+--------------+--------------+--------------+-----------------------+
 
-        Command breakdown:
+        |
+        | **Command breakdown**
 
-        Byte	    Setting	                    Description
-        ---------------------------------------------------------------------------------------------------------------
-        Byte 1	    I=Instant Command           Sets command to either Instant or Buffer.
-                    B=Buffer Command
-        Byte 2-3	0-99	                    Optional Command ID
-        Byte 4-5	UA=Set X-Axis and Y-Axis	Sets both X-Axis and Y-Axis settings
-        Byte 6-12	0000000-1000000	            Sets the Frequency for the channel in 1Hz steps for X-Axis
-        Byte 14-17	00000	                    Sets the Duty Cycle 0-100% for X-Axis
-                                                The last 2 digits are decimal places. So 08050 would be 80.5%
-        Byte 18-24	0000000-1000000	            Sets the Frequency for the channel in 1Hz steps for Y-Axis
-        Byte 25-29	00000	                    Sets the Duty Cycle 0-100% for Y-Axis
-                                                The last 2 digits are decimal places. So 08050 would be 80.5%
-        Byte 30	    *	                        End of Command
+        +------------+---------------------------+---------------------------------------------------------------------------+
+        | Byte	     | Setting	                 | Description                                                               |
+        +============+===========================+===========================================================================+
+        | Byte 1     | I=Instant Command         | Sets command to either Instant or Buffer.                                 |
+        |            | B=Buffer Command          |                                                                           |
+        +------------+---------------------------+---------------------------------------------------------------------------+
+        | Byte 2-3   | 0-99                      | Optional Command ID                                                       |
+        +------------+---------------------------+---------------------------------------------------------------------------+
+        | Byte 4-5   | UA=Set X-Axis and Y-Axis  | Sets both X-Axis and Y-Axis settings                                      |
+        +------------+---------------------------+---------------------------------------------------------------------------+
+        | Byte 6-12  | 0000000-1000000           | Sets the Frequency for the channel in 1Hz steps for X-Axis                |
+        +------------+---------------------------+---------------------------------------------------------------------------+
+        | Byte 13-17 | 00000                     | Sets the Duty Cycle 0-100% for X-Axis                                     |
+        +------------+---------------------------+---------------------------------------------------------------------------+
+        | Byte 18-24 | 0000000-1000000           | Sets the Frequency for the channel in 1Hz steps for Y-Axis                |
+        +------------+---------------------------+---------------------------------------------------------------------------+
+        | Byte 25-29 | 00000                     | Sets the Duty Cycle 0-100% for Y-Axis                                     |
+        +------------+---------------------------+---------------------------------------------------------------------------+
+        | Byte 30    | \*                        | End of Command                                                            |
+        +------------+---------------------------+---------------------------------------------------------------------------+
+
+        |
+        | **Reply**
 
         The PTHAT will send back a reply when it receives a command and also when it has completed a command.
         If the Command sent ID number was set for bytes 2-3, then this will be returned in the reply.
         These can be turned off if needed.
 
-        Set both PWM channels       Set both PWM channels
-        Received	                Completed
-        ---------------------------------------------------------------------------------------------------------------
-        RI00UA*	                    CI00UA*
+        +---------------------------+---------------------------+-----------------------------------------------------------------------------------------------+
+        | | Set both PWM channels   | | Set both PWM channels   |                                                                                               |
+        | | Received                | | Completed               |                                                                                               |
+        +===========================+===========================+===============================================================================================+
+        |    RI00UA*                |    CI00UA*                |                                                                                               |
+        +---------------------------+---------------------------+-----------------------------------------------------------------------------------------------+
         """
         if not self._validate_command():
             return False

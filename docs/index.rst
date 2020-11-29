@@ -24,6 +24,7 @@ Guide
    :caption: Contents:
 
    help
+   module
    api
    faq
    license

@@ -6,12 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+
+
+##  [1.0.0]
 ### Added
 - Method to calculate revolutions from pulse count and steps per revolution
 - Added example ChangeSpeed
 - Added example to stop the motor in case a bug is encountered leaving the motor running
 - Added CalculateRampUp script to help with testing and checking values
-- Most documentation
+- Completed the documentation
 
 ### Changed
 - Documentation in the pthat module to be compatible with Sphinx
@@ -64,7 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new setup files and uploaded project to PyPI
 
 
-[Unreleased]: https://github.com/drizztguen77/pthat/compare/v0.9.10...HEAD
+[Unreleased]: https://github.com/drizztguen77/pthat/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/drizztguen77/pthat/compare/v0.9.10...v1.0.0
 [0.9.10]: https://github.com/drizztguen77/pthat/compare/v0.9.9...v0.9.10
 [0.9.9]: https://github.com/drizztguen77/pthat/compare/v0.9.8...v0.9.9
 [0.9.8]: https://github.com/drizztguen77/pthat/compare/v0.9.7...v0.9.8

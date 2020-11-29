@@ -62,9 +62,18 @@ To install this package from pypi:
 pip install pthat
 ```
 
+## Version
+
+When the version is changed, there are currently three places the version number
+must be changed
+- pthat.py - _version variable
+- setup.py - version parameter
+- CHANGELOG.md
+
+
 ## TODO
 
-- Example for changing direction after x number of revolutions
+- Example for changing direction after n number of revolutions
 - Example of reading pulse count and printing number of revolutions
 - Async sending and reading the serial device
-
+- Complete response parsing method
