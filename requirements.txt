@@ -1,2 +1,4 @@
-pyserial~=3.4
+pyserial~=3.5
 setuptools~=50.3.2
+
+pthat~=1.0.0
