@@ -1,2 +1,3 @@
 six
 pyserial
+sphinx==3.3.1
