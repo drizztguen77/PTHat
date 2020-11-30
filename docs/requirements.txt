@@ -1,2 +1,2 @@
 six
-pthat
+pyserial
