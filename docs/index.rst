@@ -21,7 +21,6 @@ Guide
 
 .. toctree::
    :maxdepth: 4
-   :caption: Contents:
 
    help
    module
