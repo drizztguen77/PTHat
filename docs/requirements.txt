@@ -1,3 +1,2 @@
 six
 pyserial
-pthat
