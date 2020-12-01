@@ -54,12 +54,12 @@ wait_for_responses(xaxis, ["RI01CX*", "CI01CX*"], "------- Set axis command resp
 
 # Send back pulse count for each full revolution
 xaxis.send_command(xaxis.set_auto_count_pulse_out(pulse_count=steps_per_rev, xreplies=1))
-wait_for_responses(xaxis, ["RI00JX*", "DI00JX*"], "------- Set auto count pulse out command responses -------")
+wait_for_responses(xaxis, ["RI00JX*"], "------- Set auto count pulse out command responses -------")
 
 # Start the motor
 xaxis.send_command(xaxis.start())
 # Check for both reply and complete responses to be returned
-wait_for_responses(xaxis, ["RI01SX*", "CI01SX*"], "------- Start command responses -------")
+wait_for_responses(xaxis, ["RI01SX*", "CI01SX*", "DI00JX*"], "------- Start command responses -------")
 
 # Print the pulse counts
 print_pulse_count_responses(axis=xaxis)
