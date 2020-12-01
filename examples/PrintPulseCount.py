@@ -59,9 +59,10 @@ wait_for_responses(xaxis, ["RI01JX*"], "------- Set auto count pulse out command
 # Start the motor
 xaxis.send_command(xaxis.start())
 # Check for both reply and complete responses to be returned
-wait_for_responses(xaxis, ["RI01SX*", "CI01SX*"], "------- Start command responses -------")
+wait_for_responses(xaxis, ["RI01SX*"], "------- Start command responses -------")
 
 # Print the pulse counts - "DI01JX*"
 print_pulse_count_responses(axis=xaxis)
 
 wait_for_responses(xaxis, ["CI01JX*"], "------- Auto count pulse out command responses complete -------")
+wait_for_responses(xaxis, ["CI01SX*"], "------- Start command responses complete -------")
