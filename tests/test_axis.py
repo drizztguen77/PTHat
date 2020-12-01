@@ -20,9 +20,9 @@ class TestAxis(unittest.TestCase):
         self.axis.pulse_counts_sent_back = 0
         self.axis.wait_delay = 0
         self.axis.enable_disable_x_pulse_count_replies = 1
-        self.axis.enable_disable_y_pulse_count_replies = 1
-        self.axis.enable_disable_z_pulse_count_replies = 1
-        self.axis.enable_disable_e_pulse_count_replies = 1
+        self.axis.enable_disable_y_pulse_count_replies = 0
+        self.axis.enable_disable_z_pulse_count_replies = 0
+        self.axis.enable_disable_e_pulse_count_replies = 0
         self.axis.pause_all_return_x_pulse_count = 0
         self.axis.pause_all_return_y_pulse_count = 0
         self.axis.pause_all_return_z_pulse_count = 0

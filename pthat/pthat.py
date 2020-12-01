@@ -1631,7 +1631,7 @@ class Axis(PTHat):
         +==========+============+============+==============+===========+===========+===========+===========+===========+
         |     I    |     00     |     JX     |  0000000100  |      1    |      1    |      1    |     1     |     \*    |
         +----------+------------+------------+--------------+-----------+-----------+-----------+-----------+-----------+
-
+I01JX00000064001111
         |
         | **Command breakdown**
 
@@ -2883,9 +2883,9 @@ class Axis(PTHat):
         self.pulse_count_change_direction = 0
         self.pulse_counts_sent_back = 0
         self.enable_disable_x_pulse_count_replies = 1
-        self.enable_disable_y_pulse_count_replies = 1
-        self.enable_disable_z_pulse_count_replies = 1
-        self.enable_disable_e_pulse_count_replies = 1
+        self.enable_disable_y_pulse_count_replies = 0
+        self.enable_disable_z_pulse_count_replies = 0
+        self.enable_disable_e_pulse_count_replies = 0
         self.pause_all_return_x_pulse_count = 0
         self.pause_all_return_y_pulse_count = 0
         self.pause_all_return_z_pulse_count = 0
