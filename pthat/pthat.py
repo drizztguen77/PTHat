@@ -1212,17 +1212,17 @@ class Axis(PTHat):
     | Enable/disable X axis pulse count replies. This can be set directly.
     | 0=Disable X Axis Pulse Replies, 1=Enable X Axis Pulse Reply
     """
-    enable_disable_y_pulse_count_replies = 1
+    enable_disable_y_pulse_count_replies = 0
     """
     | Enable/disable Y axis pulse count replies. This can be set directly.
     | 0=Disable Y Axis Pulse Replies, 1=Enable Y Axis Pulse Reply
     """
-    enable_disable_z_pulse_count_replies = 1
+    enable_disable_z_pulse_count_replies = 0
     """
     | Enable/disable Z axis pulse count replies. This can be set directly.
     | 0=Disable Z Axis Pulse Replies, 1=Enable Z Axis Pulse Reply
     """
-    enable_disable_e_pulse_count_replies = 1
+    enable_disable_e_pulse_count_replies = 0
     """
     | Enable/disable E axis pulse count replies. This can be set directly.
     | 0=Disable E Axis Pulse Replies, 1=Enable E Axis Pulse Reply
@@ -1615,11 +1615,11 @@ class Axis(PTHat):
                             self.pulse_count
         :param xreplies: enable/disable X axis pulse count replies, disable = 0, enable = 1 - default 1 or
                          self.enable_disable_x_pulse_count_replies
-        :param yreplies: enable/disable Y axis pulse count replies, disable = 0, enable = 1 - default 1 or
+        :param yreplies: enable/disable Y axis pulse count replies, disable = 0, enable = 1 - default 0 or
                          self.enable_disable_y_pulse_count_replies
-        :param zreplies: enable/disable Z axis pulse count replies, disable = 0, enable = 1 - default 1 or
+        :param zreplies: enable/disable Z axis pulse count replies, disable = 0, enable = 1 - default 0 or
                          self.enable_disable_z_pulse_count_replies
-        :param ereplies: enable/disable E axis pulse count replies, disable = 0, enable = 1 - default 1 or
+        :param ereplies: enable/disable E axis pulse count replies, disable = 0, enable = 1 - default 0 or
                          self.enable_disable_e_pulse_count_replies
         :returns: the command to send to the serial port
         :rtype: str
