@@ -20,7 +20,7 @@ def wait_for_responses(axis, responses_to_check, msg):
 def print_pulse_count_responses(axis):
     responses = axis.get_all_responses()
     # XP(D)XResult*
-    while any(x for x in responses if x.startswith(f"{axis.axis}P")):
+    while any(x for x in responses if x.startswith(f"{axis.axis}P" or x == f"DI01J{axis.axis}*")):
         axis.parse_responses(responses)
         responses = axis.get_all_responses()
 
@@ -59,9 +59,9 @@ wait_for_responses(xaxis, ["RI01JX*"], "------- Set auto count pulse out command
 # Start the motor
 xaxis.send_command(xaxis.start())
 # Check for both reply and complete responses to be returned
-wait_for_responses(xaxis, ["RI01SX*", "CI01SX*", "DI01JX*"], "------- Start command responses -------")
+wait_for_responses(xaxis, ["RI01SX*", "CI01SX*"], "------- Start command responses -------")
 
-# Print the pulse counts
+# Print the pulse counts - "DI01JX*"
 print_pulse_count_responses(axis=xaxis)
 
 wait_for_responses(xaxis, ["CI01JX*"], "------- Auto count pulse out command responses complete -------")
