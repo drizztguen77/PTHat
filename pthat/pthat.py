@@ -90,7 +90,7 @@ class PTHat:
        :type test_mode: boolean, optional
     """
     # Properties
-    _version = "1.0.0"  # Version of this API
+    _version = "1.0.1"  # Version of this API
     command_type = "I"
     """
     | Type of command, instant or buffer. This can be set directly.
