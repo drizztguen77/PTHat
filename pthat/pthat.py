@@ -2517,7 +2517,7 @@ class Axis(PTHat):
         +==================+==================+==================+==================+==================+==================+==================+==================+
         |   RI00XP*        |   RI00YP*        |   RI00ZP*        |   RI00EP*        |   CI00XP*        |   CI00YP*        |   CI00ZP*        |   CI00EP*        |
         +------------------+------------------+------------------+------------------+------------------+------------------+------------------+------------------+
-        | | XP(D)XResult   | | YP(D)XResult   | | ZP(D)XResult   | | EP(D)XResult   |                                                                           |
+        | | XP(D)XResult*  | | YP(D)XResult*  | | ZP(D)XResult*  | | EP(D)XResult*  |                                                                           |
         | |                | |                | |                | |                |                                                                           |
         | | (D)=Direction  | | (D)=Direction  | | (D)=Direction  | | (D)=Direction  |                                                                           |
         | | of X motor     | | of Y motor     | | of Z motor     | | of E motor     |                                                                           |
