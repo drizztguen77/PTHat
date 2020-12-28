@@ -17,14 +17,18 @@ def wait_for_responses(axis, responses_to_check, msg):
     axis.parse_responses(responses)
 
 
-def print_pulse_count_responses(axis):
-    responses = axis.get_all_responses()
-    # XP(D)XResult*
-    while any(x for x in responses if x.startswith(f"{axis.axis}P" or x == f"DI01J{axis.axis}*")):
-        axis.parse_responses(responses)
-        responses = axis.get_all_responses()
+def print_pulse_count_responses(axis, response_to_end):
+    response = axis.get_response()
+    while True:
+        if response == response_to_end:
+            break
 
-    axis.parse_responses(responses)
+        # Look for XP(D)XResult*
+        if response.startswith(f"{axis.axis}P"):
+            print(f"Response: {response}")
+            response = axis.get_response()
+
+    print(f"Response: {response}")
 
 
 steps_per_rev = int(input("How many steps per revolution [1600]? ") or "1600")
@@ -47,7 +51,8 @@ xaxis.debug = True
 frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
 pulse_count = xaxis.calculate_pulse_count(steps_per_rev, total_revolutions)
 set_axis_cmd = xaxis.set_axis(frequency=frequency, pulse_count=pulse_count, direction=direction,
-                              start_ramp=1, finish_ramp=1, ramp_divide=ramp_divide, ramp_pause=ramp_pause, enable_line_polarity=1)
+                              start_ramp=1, finish_ramp=1, ramp_divide=ramp_divide, ramp_pause=ramp_pause,
+                              enable_line_polarity=0)
 xaxis.send_command(set_axis_cmd)
 # Get the responses - look for both responses to be returned before continuing
 wait_for_responses(xaxis, ["RI01CX*", "CI01CX*"], "------- Set axis command responses -------")
@@ -62,7 +67,4 @@ xaxis.send_command(xaxis.start())
 wait_for_responses(xaxis, ["RI01SX*"], "------- Start command responses -------")
 
 # Print the pulse counts - "DI01JX*"
-print_pulse_count_responses(axis=xaxis)
-
-wait_for_responses(xaxis, ["CI01JX*"], "------- Auto count pulse out command responses complete -------")
-wait_for_responses(xaxis, ["CI01SX*"], "------- Start command responses complete -------")
+print_pulse_count_responses(axis=xaxis, response_to_end="CI01SX")

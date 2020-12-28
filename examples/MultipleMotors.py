@@ -46,8 +46,9 @@ frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_d
 pulse_count = xaxis.calculate_pulse_count(steps_per_rev, total_revolutions)
 
 # Setup the X axis
+rdc = int(rpm / 10)
 xaxis.set_axis(frequency=frequency, pulse_count=pulse_count, direction=direction,
-               start_ramp=1, finish_ramp=1, ramp_divide=100, ramp_pause=10, enable_line_polarity=1)
+               start_ramp=1, finish_ramp=1, ramp_divide=rdc, ramp_pause=10, enable_line_polarity=1)
 # Get the responses - look for both responses to be returned before continuing
 wait_for_responses(["RI01CX*", "CI01CX*"], "------- Set X axis command responses -------")
 

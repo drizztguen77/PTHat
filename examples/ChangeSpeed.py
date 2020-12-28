@@ -7,7 +7,7 @@ This example does not auto send the commands. It gets the command and then sends
 from pthat.pthat import Axis
 import time
 
-ramp_up_speed = 100
+ramp_up_speed = 200
 
 
 def wait_for_responses(axis, responses_to_check, msg):
@@ -62,7 +62,7 @@ wait_for_responses(xaxis, ["RI01SX*"], "------- Start command responses -------"
 # First calculate the ramp up frequency for the original speed
 frequency = xaxis.rpm_to_frequency(rpm=rpm, steps_per_rev=steps_per_rev, round_digits=3)
 # ramp_up_freq = frequency / ramp_up_speed
-ramp_up_freq = 160
+ramp_up_freq = 30
 
 # Speed up 100 RPM's
 new_speed_rpm_100 = rpm + 100
