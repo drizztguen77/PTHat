@@ -2,7 +2,17 @@
 
 Pulse Train HAT Python API. This is a Python API to control the PTHAT from CNC Design Limited
 
+## Installation
 
+Make sure pip, wheel, setuptools and virtualenv are all installed.
+```
+python -m pip install --upgrade pip wheel setuptools virtualenv
+```
+
+To install the dependencies
+```
+pip install -r requirements.txt
+```
 
 ## Build
 
@@ -35,7 +45,7 @@ https://test.pypi.org/project/pthat/
 Token to upload this project to TestPyPI:
 ```
 Username: __token__
-Password: pypi-AgENdGVzdC5weXBpLm9yZwIkZjRjOWE2NDctYTI4MC00N2M0LWI1NDEtZmJjNTcyZTVjOTI4AAI2eyJwZXJtaXNzaW9ucyI6IHsicHJvamVjdHMiOiBbInB0aGF0Il19LCAidmVyc2lvbiI6IDF9AAAGIEfC11_SYnhL6S5C2xfRD2-HcgZ-iM070-FNwoJPf1ls
+Password: <token password>
 ```
 #### Keyring
 To install the tokens to a local keyring do the following. Each command will prompt for the password. Just copy and paste the token.
